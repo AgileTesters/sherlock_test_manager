@@ -2,8 +2,8 @@
 from datetime import datetime
 
 from sherlock_back.api import db
-from sherlock_back.api.data.model import (Cycle, CycleCases,
-                                          CycleScenarios, StateType)
+from sherlock_back.api.controllers.shared.cycle_project import count_cycle_stats
+from sherlock_back.api.data.model import (Cycle, CycleCases, StateType)
 
 # CYCLE
 
@@ -22,10 +22,10 @@ def cycle_cases_by_project(project_id):
 
 # CYCLE - TEST CASE
 
-def create_test_case_cycle(cycle_id, case_id, scenario_id):
+def create_test_case_cycle(cycle_id, case_id, parent_id=None):
     cycle_case = CycleCases(cycle_id=cycle_id,
                             case_id=case_id,
-                            scenario_id=scenario_id)
+                            parent_id=parent_id)
     db.session.add(cycle_case)
     db.session.commit()
 
@@ -57,38 +57,20 @@ def find_project_cycles(project_id, cycle_limit):
         cycles = cycles.limit(cycle_limit).all()
     return cycles.all()
 
-
-# CYCLE - TEST SCENARIO
-
-def fetch_cycle_scenario(cycle_id, scenario_id):
-    # TODO: Fix this
-    return CycleScenarios.query.filter_by(
-        cycle_id=cycle_id).filter_by(
-        scenario_id=scenario_id).first()
-
-
-def find_cycle_scenarios(cycle_id):
-    return CycleScenarios.query.filter_by(cycle_id=cycle_id).all()
-
-
-def cycle_cases_by_scenario(cycle_id, scenario_id):
-    return CycleCases.query.filter_by(id=cycle_id).filter_by(
-        scenario_id=scenario_id).all()
-
-
-def change_cycle_scenario_state(cycle_state, cycle_id, scenario_id):
-    # blocking scenario on active current_cycle
-    cycle_scenario = fetch_cycle_scenario(cycle_id=cycle_id, scenario_id=scenario_id)
-    cycle_scenario.state_code = cycle_state
-    db.session.add(cycle_scenario)
-    db.session.commit()
-
-    # BULK STATE CHANGE FOR CYCLE TEST CASES RELATED TO THAT SCENARIO
-    cycle_cases = cycle_cases_by_scenario(cycle_id=cycle_id, scenario_id=scenario_id)
-    for case in cycle_cases:
-        case.state_code = cycle_state
-        db.session.add(case)
-        db.session.commit()
+# TODO: METHOD TO BULK CHANGE STUFF ---> REFACTOR WITH ENTITY
+# def change_cycle_scenario_state(cycle_state, cycle_id, scenario_id):
+#     # blocking scenario on active current_cycle
+#     cycle_scenario = fetch_cycle_scenario(cycle_id=cycle_id, scenario_id=scenario_id)
+#     cycle_scenario.state_code = cycle_state
+#     db.session.add(cycle_scenario)
+#     db.session.commit()
+#
+#     # BULK STATE CHANGE FOR CYCLE TEST CASES RELATED TO THAT SCENARIO
+#     cycle_cases = cycle_cases_by_scenario(cycle_id=cycle_id, scenario_id=scenario_id)
+#     for case in cycle_cases:
+#         case.state_code = cycle_state
+#         db.session.add(case)
+#         db.session.commit()
 
 
 def cycle_timeline_resume_by_project(project_id, cycle_limit):
@@ -135,7 +117,7 @@ def get_cycle_case_stats(cycle_id):
 
 
 def close_cycle(cycle_id, reason, user_id):
-    # TODO: Check untested cases. # TODO: Remeber the previous TODO hue HUE
+    # TODO: Check untested cases. # TODO: Remember the previous TODO hue HUE
 
     cycle = find_cycle(id=cycle_id)
     if cycle.state_code != StateType.closed:

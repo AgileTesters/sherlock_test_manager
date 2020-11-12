@@ -3,7 +3,7 @@ from flask import Blueprint, request, jsonify, make_response, g
 
 from sherlock_back.api import auth
 from sherlock_back.api.controllers.projects import create_project, edit_project
-from sherlock_back.api.controllers.shared.projects import project_details
+from sherlock_back.api.controllers.shared.cycles import project_details
 from sherlock_back.api.helpers.string_operations import safe_fetch_content
 
 project = Blueprint('projects', __name__)

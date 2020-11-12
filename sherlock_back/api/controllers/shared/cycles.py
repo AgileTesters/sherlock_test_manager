@@ -1,27 +1,29 @@
 from datetime import datetime
 
 from sherlock_back.api import db
-from sherlock_back.api.controllers.cases import active_cases_by_project
+from sherlock_back.api.controllers.cases import all_non_removed_cases_by_project
+
 from sherlock_back.api.controllers.cycles import create_test_case_cycle, cycle_cases_by_project, last_cycle
-from sherlock_back.api.controllers.projects import find_project
-from sherlock_back.api.controllers.scenarios import find_scenarios
-from sherlock_back.api.controllers.shared.cycle_project import count_cycle_stats, count_cycles_for_project
-from sherlock_back.api.controllers.shared.cycle_scenarios import create_scenario_cycle
+from sherlock_back.api.controllers.projects import find_project, count_cycles_for_project
+from sherlock_back.api.controllers.shared.cycle_project import count_cycle_stats
 from sherlock_back.api.controllers.users import find_user
 from sherlock_back.api.data.model import StateType, Cycle
 
 
 def check_cycle_pre_condition(project_id):
-    eligible = {
-        'have_scenarios': False,
-        'have_active_cases': False,
-    }
+    if find_project({'id': project_id}) and len(all_non_removed_cases_by_project(project_id)) > 0:
+        return True
+    return False
 
-    if find_project({'id': project_id}):
-        eligible['have_scenarios'] = True
-        if len(active_cases_by_project(project_id)) > 0:
-            eligible['have_active_cases'] = True
-    return eligible
+def project_details(project_id):
+    """Fetch and return a PROJECT with parsed data from cycles."""
+    project = find_project(project_id)
+    project_last_cycle = last_cycle_data_parser(project_id)
+    user = find_project(id=project.owner_id)
+    project.update({'owner_name': user.name})
+    project.update({'last_cycle': project_last_cycle})
+
+    return project
 
 
 def last_cycle_data_parser(project_id):
@@ -69,7 +71,7 @@ def create_cycle(project_id, cycle_name=None):
 
     # fetch all project cycles
     cycle_number = count_cycles_for_project(project_id)
-    cases = active_cases_by_project(project_id)
+    cases = all_non_removed_cases_by_project(project_id)
 
     if len(cases) == 0:
         return False
@@ -82,10 +84,11 @@ def create_cycle(project_id, cycle_name=None):
     db.session.add(new_cycle)
     db.session.commit()
 
-    # Create CYCLE Scenarios and Cases for the new cycle
-    for scenario in find_scenarios(project_id=project_id):
-        create_scenario_cycle(cycle_id=new_cycle.id, scenario_id=scenario.id)
     for case in cases:
-        create_test_case_cycle(cycle_id=new_cycle.id, case_id=case.id, scenario_id=case.scenario_id)
+        create_test_case_cycle(
+            cycle_id=new_cycle.id,
+            case_id=case.id,
+            parent_id=case.parent_id
+        )
 
     return new_cycle.id

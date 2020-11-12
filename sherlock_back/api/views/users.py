@@ -15,28 +15,29 @@ def all_users():
     return make_response(jsonify(get_all_users))
 
 
-@users.route('/get_user_by_id/<int:user_id>', methods=['GET'])
+# @users.route('/user/find/<int:user_id>', methods=['GET'])
+# @auth.login_required
+# def show_user_id(user_id):
+#     TODO: add profile restriction
+#     """Return a user.
+#     {
+#         "email": "email@email.com",
+#         "id": 1,
+#         "name": "Name"
+#     }
+#     """
+#     user = find_user(id=user_id)
+#     return make_response(jsonify(user))
+
+
+@users.route('/user/details', methods=['GET'])
 @auth.login_required
-def show_user_id(user_id):
-    """Return a user.
-    {
-        "email": "email@email.com",
-        "id": 1,
-        "name": "Name"
-    }
-    """
-    user = find_user(id=user_id)
+def show_user_email():
+    user = find_user(email=g.user.email)
     return make_response(jsonify(user))
 
 
-@users.route('/get_user_by_email/<email>', methods=['GET'])
-@auth.login_required
-def show_user_email(email):
-    user = find_user(email=email)
-    return make_response(jsonify(user))
-
-
-@users.route('/new', methods=['POST'])
+@users.route('/user/new', methods=['POST'])
 def new_user():
     """
     Param:
@@ -59,7 +60,7 @@ def new_user():
     return make_response(jsonify(message='USER_CREATED'))
 
 
-@users.route('/edit/<int:user_id>', methods=['POST'])
+@users.route('/user/edit/<int:user_id>', methods=['POST'])
 @auth.login_required
 def edit(user_id):
     """

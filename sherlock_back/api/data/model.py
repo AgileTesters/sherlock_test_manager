@@ -1,7 +1,6 @@
 """Setup for SHERLOCK database."""
 from datetime import datetime
 from enum import Enum
-from flask import g
 import bcrypt
 
 from marshmallow import Schema, fields
@@ -9,8 +8,16 @@ from marshmallow_enum import EnumField
 from itsdangerous import (TimedJSONWebSignatureSerializer
                           as Serializer, BadSignature, SignatureExpired)
 
-from sherlock_back.api import db, secretkey
+from sherlock_back.api import db, secret_key
 from sherlock_back.api.db_init import check_first_run
+
+
+class EntityType(Enum):
+    case = "case"
+    scenario = "scenario"
+    describe = "describe"
+    context = "context"
+    feature = "feature"
 
 
 class StateType(Enum):
@@ -34,7 +41,7 @@ class Project(db.Model):
     owner_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     description = db.Column(db.Text(500), nullable=False)
 
-    scenario = db.relationship('Scenario')
+    case = db.relationship('Case')
     cycle = db.relationship('Cycle')
 
     def __init__(self, name, owner_id, description):
@@ -48,37 +55,24 @@ class Project(db.Model):
         return '<Project %r>' % self.name
 
 
-class Scenario(db.Model):
-    __tablename__ = "scenario"
-    __table_args__ = {'extend_existing': True}
-
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.Text(500), nullable=False)
-    state_code = db.Column(db.Enum(StateType))
-    project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
-
-    cycle_scenarios = db.relationship('CycleScenarios')
-    cycle_cases = db.relationship('CycleCases')
-    case = db.relationship('Case')
-
-    def __init__(self, name, project_id):
-        self.name = name
-        self.project_id = project_id
-        self.state_code = StateType.active
-
-
 class Case(db.Model):
     __tablename__ = "case"
     __table_args__ = {'extend_existing': True}
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.Text(500), nullable=False)
-    scenario_id = db.Column(db.Integer, db.ForeignKey('scenario.id'))
+    project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
+    parent_id = db.Column(db.Integer, nullable=True)
+    entity = db.Column(db.Enum(EntityType))
     state_code = db.Column(db.Enum(StateType))
 
-    def __init__(self, name, scenario_id):
+    cycle_cases = db.relationship('CycleCases')
+
+    def __init__(self, name, project_id, parent_id=None):
         self.name = name
-        self.scenario_id = scenario_id
+        self.project_id = project_id
+        self.parent_id = parent_id
+        self.entity = EntityType.case
         self.state_code = StateType.active
 
 
@@ -92,15 +86,13 @@ class User(db.Model):
     password = db.Column(db.String(250), nullable=False)
     profile = db.Column(db.String(50), nullable=False)
 
-    cycle_scenarios = db.relationship('CycleScenarios')
     project = db.relationship('Project')
-
 
     def __init__(self, name, email, password, profile='user'):
         self.name = name
         self.email = email
         self.password = User.generate_hash_password(password)
-        self.profile=profile
+        self.profile = profile
 
     def verify_password(self, password):
         password = password.encode('utf-8')
@@ -114,20 +106,19 @@ class User(db.Model):
         return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
 
     def generate_auth_token(self, expiration=600):
-        s = Serializer(secretkey, expires_in=expiration)
+        s = Serializer(secret_key, expires_in=expiration)
         return s.dumps({'id': self.id})
 
     @staticmethod
-    def verify_auth_token(token):
-        s = Serializer(secretkey)
+    def verify_token_and_return_user(token):
+        s = Serializer(secret_key)
         try:
             data = s.loads(token)
         except SignatureExpired:
             return None
         except BadSignature:
             return None
-        g.user = User.query.get(data['id'])
-        return g.user
+        return User.query.get(data['id'])
 
 
 class Cycle(db.Model):
@@ -141,7 +132,6 @@ class Cycle(db.Model):
     state_code = db.Column(db.Enum(StateType))
 
     cycle_cases = db.relationship('CycleCases')
-    cycle_scenarios = db.relationship('CycleScenarios')
 
     created_at = db.Column(db.DateTime, default=datetime.now)
     closed_at = db.Column(db.DateTime)
@@ -156,23 +146,6 @@ class Cycle(db.Model):
         self.state_code = StateType.active
 
 
-class CycleScenarios(db.Model):
-    __tablename__ = "cycle_scenarios"
-    __table_args__ = {'extend_existing': True}
-
-    id = db.Column(db.Integer, primary_key=True)
-    cycle_id = db.Column(db.Integer, db.ForeignKey('cycle.id'))
-    state_code = db.Column(db.Enum(StateType))
-    scenario_id = db.Column(db.Integer, db.ForeignKey('scenario.id'))
-    last_executed_by = db.Column(db.Integer, db.ForeignKey('user.id'))
-    last_executed_at = db.Column(db.DateTime)
-
-    def __init__(self, cycle_id, scenario_id):
-        self.cycle_id = cycle_id
-        self.scenario_id = scenario_id
-        self.state_code = StateType.not_executed
-
-
 class CycleCases(db.Model):
     __tablename__ = "cycle_cases"
     __table_args__ = {'extend_existing': True}
@@ -181,31 +154,16 @@ class CycleCases(db.Model):
     cycle_id = db.Column(db.Integer, db.ForeignKey('cycle.id'))
     state_code = db.Column(db.Enum(StateType))
     case_id = db.Column(db.Integer, db.ForeignKey('case.id'))
-    scenario_id = db.Column(db.Integer, db.ForeignKey('scenario.id'))
+    parent_id = db.Column(db.Integer, nullable=True)
     last_executed_by = db.Column(db.Integer, db.ForeignKey('user.id'))
     last_executed_at = db.Column(db.DateTime)
 
-    def __init__(self, cycle_id, scenario_id, case_id):
+    def __init__(self, cycle_id, case_id, parent_id):
         """Setting params to the object."""
         self.cycle_id = cycle_id
         self.case_id = case_id
-        self.scenario_id = scenario_id
+        self.parent_id = parent_id
         self.state_code = StateType.not_executed
-
-class NotesScenario(db.Model):
-    __tablename__ = "notes_scenario"
-    __table_args__ = {'extend_existing': True}
-
-    id = db.Column(db.Integer, primary_key=True)
-    cycle_id = db.Column(db.Integer, db.ForeignKey('cycle.id'))
-    scenario_id = db.Column(db.Integer)
-    text = db.Column(db.Text)
-
-    def __init__(self, cycle_id, scenario_id,  text):
-        """Setting params to the object."""
-        self.cycle_id = cycle_id
-        self.scenario_id = scenario_id
-        self.text = text
 
 
 class NotesCase(db.Model):
@@ -223,18 +181,6 @@ class NotesCase(db.Model):
         self.case_id = case_id
         self.text = text
 
-class TagScenario(db.Model):
-    __tablename__ = "tags_scenario"
-    __table_args__ = {'extend_existing': True}
-
-    id = db.Column(db.Integer, primary_key=True)
-    scenario_id = db.Column(db.Integer)
-    tag = db.Column(db.String(250))
-
-    def __init__(self, scenario_id, tag):
-        self.scenario_id = scenario_id
-        self.tag = tag
-
 
 class TagCase(db.Model):
     __tablename__ = "tags_case"
@@ -249,43 +195,13 @@ class TagCase(db.Model):
         self.tag = tag
 
 
-class SherlockSettings(db.Model):
-    __tablename__ = "sherlock_settings"
-    __table_args__ = {'extend_existing': True}
-
-    id = db.Column(db.Integer, primary_key=True)
-    setting = db.Column(db.String(250))
-    value = db.Column(db.String(250))
-    who_can_change = db.Column(db.String(250))
-    label = db.Column(db.String(250))
-
-    def __init__(self, setting, value, label, who_can_change='admin'):
-        self.setting = setting
-        self.value = value
-        self.who_can_change = who_can_change
-        self.label = label
-
-
 #  SCHEMAS #####
-
-
-class TagScenarioSchema(Schema):
-    id = fields.Int(dump_only=True)
-    scenario_id = fields.Int()
-    tag = fields.Str()
 
 
 class TagCaseSchema(Schema):
     id = fields.Int(dump_only=True)
     case_id = fields.Int()
     tag = fields.Str()
-
-
-class SettingsSchema(Schema):
-    id = fields.Int(dump_only=True)
-    setting = fields.Str()
-    value = fields.Str()
-    label = fields.Str()
 
 
 class CycleSchema(Schema):
@@ -301,16 +217,10 @@ class CycleSchema(Schema):
 
 class TestCaseSchema(Schema):
     id = fields.Int(dump_only=True)
-    scenario_id = fields.Int()
-    name = fields.Str()
-    state_code = EnumField(StateType)
-
-
-class ScenariosSchema(Schema):
-    id = fields.Int(dump_only=True)
-    name = fields.Str()
-    state_code = EnumField(StateType)
     project_id = fields.Int()
+    parent_id = fields.Int()
+    name = fields.Str()
+    state_code = EnumField(StateType)
 
 
 class UsersSchema(Schema):
@@ -326,5 +236,6 @@ class ProjectSchema(Schema):
     owner_id = fields.Int()
     type_of_project = fields.Str()
     privacy_policy = fields.Str()
+
 
 check_first_run(db)

@@ -4,39 +4,52 @@ import pathlib
 
 
 from flask import Flask, jsonify, make_response, g
-from flask_httpauth import HTTPBasicAuth
+from flask_httpauth import HTTPBasicAuth, HTTPTokenAuth
 from flask_sqlalchemy import SQLAlchemy
 
 from sherlock_back.api.dbconfig import prod_db, dev_db
 from sherlock_back.api.blueprints import register_blue_prints
-from sherlock_back.api.support import config
+from sherlock_back.api import config
 
 app = Flask(__name__, instance_relative_config=True)
 current_folder = pathlib.Path(__file__).parent.absolute()
 
 app.config.from_object(config)
+secret_key = app.config['SECRET_KEY']
+
 
 if 'SHERLOCK_ENV' in os.environ:
     if os.environ['SHERLOCK_ENV'] == 'PROD':
-        dburl = prod_db()
+        db_url = prod_db()
 else:
     from flask_cors import CORS
     CORS(app, resources={r'/*': {"origins": '*', 'allow_headers': '*'}})
     db_url = dev_db()
-    dburl = 'root:sherlock@localhost/sherlockdb'
 
-SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://{}'.format(dburl)
+
+SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://{}'.format(db_url)
 app.config['SQLALCHEMY_DATABASE_URI'] = SQLALCHEMY_DATABASE_URI
 
-db = SQLAlchemy(app)
-auth = HTTPBasicAuth()
-secretkey = app.config['SECRET_KEY']
-token_timeout = app.config['TOKEN_TIMEOUT']
+
+# Authentication Process
+auth = HTTPTokenAuth(scheme='Bearer')
+login = HTTPBasicAuth()
+
 
 # Will load the Models and create the tables
+db = SQLAlchemy(app)
 from sherlock_back.api.data import model
 
 register_blue_prints(app)
+
+
+@auth.verify_token
+def verify_token(user_token):
+    user_data = model.User.verify_token_and_return_user(user_token)
+    if user_data:
+        g.user = user_data
+        return True
+    return False
 
 
 @app.errorhandler(404)
@@ -44,27 +57,20 @@ def page_not_found(error):
     return make_response(jsonify(message="ENDPOINT_NOTFOUND"), 404)
 
 
-@auth.verify_password
-def verify_password(username_or_token, password):
-    """
-    TODO: ajust except.
-    """
-    try:
-        if model.User.verify_auth_token(username_or_token):
-            g.user = model.User.verify_auth_token(username_or_token)
-            return True
-        else:
-            g.user = model.User.query.filter_by(email=username_or_token).first()
-            if g.user and g.user.verify_password(password):
-                return True
-            else:
-                return False
-    except:
-        return False
+@login.verify_password
+def verify_password(email, password):
+    user = model.User.query.filter_by(email=email).first()
+    if user and user.verify_password(password):
+        return True
+    return False
 
 
-@app.route('/api/auth_token', methods=['POST'])
-@auth.login_required
-def get_auth_token():
-    token = g.user.generate_auth_token(604800)
-    return jsonify({'token': token.decode('ascii'), 'duration': 604800})
+@app.route('/api/login', methods=['POST'])
+@login.login_required
+def login_and_generate_token():
+    user_token = g.user.generate_auth_token(604800)
+    return jsonify(
+        {
+            'token': user_token.decode('ascii'),
+            'duration': 604800,
+        })

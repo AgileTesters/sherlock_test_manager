@@ -7,7 +7,6 @@ from sherlock_back.api.controllers.cycles import (cycle_timeline_resume_by_proje
                                                   change_cycle_case_state_code)
 from sherlock_back.api.controllers.projects import find_project
 from sherlock_back.api.controllers.shared.cycle_case import parse_test_cases_for_cycle
-from sherlock_back.api.controllers.shared.cycle_scenarios import parse_scenarios_for_cycle
 from sherlock_back.api.controllers.shared.cycles import create_cycle
 from sherlock_back.api.data.model import StateType
 
@@ -78,26 +77,16 @@ def create():
         return make_response(jsonify(message='CYCLE_CREATED', cycle_id=cycle_id))
 
 
-@cycles.route('/cycle/<int:cycle_id>/project/<int:project_id>/scenarios', methods=['GET'])
+@cycles.route('/cycle/<int:cycle_id>/project/<int:project_id>/cases', methods=['GET'])
 @auth.login_required
-def get_scenarios_for_cyle(cycle_id, project_id):
-    scenarios = parse_scenarios_for_cycle(cycle_id=cycle_id, project_id=project_id)
-    return make_response(jsonify(scenarios))
-
-
-@cycles.route('/cycle/<int:cycle_id>/project/<int:project_id>/scenarios/scenario/<int:scenario_id>/cases',
-              methods=['GET'])
-@auth.login_required
-def get_cases_for_cyle(project_id, cycle_id, scenario_id):
-    scenario_with_cases = parse_test_cases_for_cycle(cycle_id, scenario_id)
+def get_cases_for_cycle(project_id, cycle_id):
+    scenario_with_cases = parse_test_cases_for_cycle(cycle_id, project_id)
     return make_response(jsonify(scenario_with_cases))
 
 
-@cycles.route(
-    '/cycle/<int:cycle_id>/project/<int:project_id>/scenarios/scenario/<int:scenario_id>/cases/case/<int:case_id>',
-    methods=['GET'])
+@cycles.route('/cycle/<int:cycle_id>/project/<int:project_id>/cases/case/<int:case_id>',methods=['GET'])
 @auth.login_required
-def change_cycle_case_state_code_(project_id, cycle_id, scenario_id, case_id):
+def change_cycle_case_state_code_(project_id, cycle_id, case_id):
     """ Endpoint for changing the cycle cases state_code .
     Param:
         {
@@ -112,7 +101,6 @@ def change_cycle_case_state_code_(project_id, cycle_id, scenario_id, case_id):
 
     if action not in StateType.__members__:
         return abort(make_response(jsonify(message='ACTION_UNKNOW'), 400))
-
 
     changed = change_cycle_case_state_code(
         action=action,

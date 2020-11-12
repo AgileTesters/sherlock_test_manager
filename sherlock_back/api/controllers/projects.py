@@ -32,3 +32,8 @@ def edit_project(project_id, project_payload):
     project_data = Project.query.filter(Project.id == project_id).update(project_changes)
     db.session.add(project_data)
     db.session.commit()
+
+
+def count_cycles_for_project(project_id):
+    all_project_cycles = find_project_cycles(project_id=project_id, cycle_limit=0)
+    return len(all_project_cycles)

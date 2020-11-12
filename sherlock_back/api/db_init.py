@@ -1,6 +1,6 @@
 def check_first_run(db):    
     db.create_all()
-    from sherlock_back.api.data.model import User, SherlockSettings
+    from sherlock_back.api.data.model import User
 
     user = User.query.filter_by(id=1).first()
     if user is None:
@@ -11,11 +11,3 @@ def check_first_run(db):
         db.session.add(initial_user)
         db.session.commit()
 
-    # SherlockSettings
-    open_register_setting = SherlockSettings.query.filter_by(
-        setting='OPEN_USER_REGISTER').first()
-    if not open_register_setting:
-        open_user_register = SherlockSettings(
-            'OPEN_USER_REGISTER', 'True', 'Anyone can register?')
-        db.session.add(open_user_register)
-        db.session.commit()

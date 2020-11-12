@@ -1,24 +1,23 @@
 from sherlock_back.api import db
 from sherlock_back.api.controllers.cycles import find_cycle_case, last_cycle
-from sherlock_back.api.controllers.scenarios import find_scenario
-from sherlock_back.api.data.model import (Case, TestCaseSchema, StateType, Scenario)
+from sherlock_back.api.data.model import (Case, TestCaseSchema, StateType, EntityType)
 
 
-def all_non_removed_cases_by_scenario(scenario_id):
+def all_non_removed_cases_by_project(project_id):
     schema = TestCaseSchema(many=True)
     cases_query_result = Case.query.filter_by(
-        scenario_id=scenario_id).filter(
+        project_id=project_id).filter(
         Case.state_code != StateType.removed).all()
     return schema.dump(cases_query_result).data
 
 
-def active_cases_by_project(project_id):
-    schema = TestCaseSchema(many=True)
-    cases_query_result =  Case.query.join(
-        Scenario, Case.scenario_id == Scenario.id).filter(
-        Scenario.project_id == project_id).filter(
-        Case.state_code == StateType.active).all()
-    return schema.dump(cases_query_result).data
+# def active_cases_by_project(project_id):
+#     schema = TestCaseSchema(many=True)
+#     cases_query_result =  Case.query.join(
+#         Scenario, Case.scenario_id == Scenario.id).filter(
+#         Scenario.project_id == project_id).filter(
+#         Case.state_code == StateType.active).all()
+#     return schema.dump(cases_query_result).data
 
 
 def find_test_case(test_case_id):
@@ -74,9 +73,8 @@ def __change_cycle_test_case_state_code(case_id, state_code):
     """
     # JUST TO FIND THE PROJECT_ID
     case = find_test_case(test_case_id=case_id)
-    scenario = find_scenario(scenario_id=case.scenario_id)
 
-    cycle = last_cycle(scenario.project_id)
+    cycle = last_cycle(case.project_id)
     cycle_case = find_cycle_case(cycle_id=cycle.id, case_id=case_id)
     if cycle and cycle_case and state_code:
         cycle_case.state_code = state_code
