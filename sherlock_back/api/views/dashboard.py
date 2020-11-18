@@ -3,8 +3,8 @@ from flask import Blueprint, jsonify, make_response
 
 from sherlock_back.api import auth
 from sherlock_back.api.controllers.cycles import last_cycle
+from sherlock_back.api.controllers.projects import get_all_projects
 from sherlock_back.api.controllers.shared.cycle_project import count_cycle_stats
-from sherlock_back.api.data.model import Project, ProjectSchema
 from sherlock_back.api.data.model import CycleCases
 
 dashboard = Blueprint('dashboard', __name__)
@@ -13,8 +13,8 @@ dashboard = Blueprint('dashboard', __name__)
 @dashboard.route('/', methods=['GET'])
 @auth.login_required
 def home():
-    schema = ProjectSchema(many=True)
-    projects = schema.dump(Project.query.all()).data
+
+    projects = get_all_projects()
 
     for item in projects:
         project_last_cycle = last_cycle(item['id'])

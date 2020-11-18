@@ -8,7 +8,7 @@ def all_non_removed_cases_by_project(project_id):
     cases_query_result = Case.query.filter_by(
         project_id=project_id).filter(
         Case.state_code != StateType.removed).all()
-    return schema.dump(cases_query_result).data
+    return schema.dump(cases_query_result)
 
 
 # def active_cases_by_project(project_id):
@@ -24,7 +24,7 @@ def find_test_case(test_case_id):
     """Return Testcase Info."""
     test_case = Case.query.filter_by(id=test_case_id).first()
     tst_case_schema = TestCaseSchema(many=False)
-    return tst_case_schema.dump(test_case).data
+    return tst_case_schema.dump(test_case)
 
 
 def change_status_to_disable(case_id):

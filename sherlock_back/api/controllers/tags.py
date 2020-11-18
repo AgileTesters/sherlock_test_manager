@@ -9,7 +9,7 @@ def find_tags_by_case_id(case_id):
     tag_cases = TagCase.query.filter_by(
         case_id=case_id).all()
     schema = TagCaseSchema(many=True)
-    return schema.dump(tag_cases).data
+    return schema.dump(tag_cases)
 
 
 def get_tag_case(tag_case_id):

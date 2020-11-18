@@ -7,12 +7,12 @@ from sherlock_back.api.data.model import User, UsersSchema
 def find_user(**kwargs):
     user = User.query.filter_by(**kwargs).first()
     user_schema = UsersSchema(many=False)
-    return user_schema.dump(user).data
+    return user_schema.dump(user)
 
 
 def get_all_users():
     user_schema = UsersSchema(many=True)
-    users = user_schema.dump(User.query.all()).data
+    users = user_schema.dump(User.query.all())
     return users
 
 

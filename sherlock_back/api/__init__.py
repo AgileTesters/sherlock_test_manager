@@ -15,8 +15,8 @@ app = Flask(__name__, instance_relative_config=True)
 current_folder = pathlib.Path(__file__).parent.absolute()
 
 app.config.from_object(config)
-secret_key = app.config['SECRET_KEY']
-
+# secret_key = app.config['SECRET_KEY']
+secret_key = 'temporarytoken'
 
 if 'SHERLOCK_ENV' in os.environ:
     if os.environ['SHERLOCK_ENV'] == 'PROD':
@@ -61,6 +61,7 @@ def page_not_found(error):
 def verify_password(email, password):
     user = model.User.query.filter_by(email=email).first()
     if user and user.verify_password(password):
+        g.user = user
         return True
     return False
 
@@ -69,8 +70,9 @@ def verify_password(email, password):
 @login.login_required
 def login_and_generate_token():
     user_token = g.user.generate_auth_token(604800)
-    return jsonify(
+    return make_response(jsonify(
         {
             'token': user_token.decode('ascii'),
             'duration': 604800,
         })
+    )

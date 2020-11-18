@@ -37,7 +37,7 @@ def show_user_email():
     return make_response(jsonify(user))
 
 
-@users.route('/user/new', methods=['POST'])
+@users.route('/new', methods=['POST'])
 def new_user():
     """
     Param:
@@ -47,7 +47,6 @@ def new_user():
         'password': required
      }
     """
-
     # Avoid email duplicates - Better error Handler
     if find_user(email=safe_fetch_content(request, 'email')):
         return make_response(jsonify(message='EMAIL_IN_USE'))

@@ -25,7 +25,7 @@ def safe_fetch_content(request, name):
         is not empty.
     """
 
-    obj = request.json.get(name, default=None)
+    obj = request.json.get(name)
     if not obj:
         abort(make_response(jsonify(message='MISSING_{}'.format(name.upper())), 400))
 

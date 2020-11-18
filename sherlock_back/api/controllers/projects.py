@@ -1,14 +1,21 @@
 """Sherlock Project Controllers"""
 
 from sherlock_back.api import db
+from sherlock_back.api.controllers.cycles import find_project_cycles
 from sherlock_back.api.controllers.users import find_user
 from sherlock_back.api.data.model import Project, ProjectSchema
+
+
+def get_all_projects():
+    projects = Project.query.all()
+    project_schema = ProjectSchema(many=True)
+    return project_schema.dump(projects)
 
 
 def find_project(project_id):
     project = Project.query.filter_by({'id': project_id}).first()
     project_schema = ProjectSchema(many=False)
-    return project_schema.dump(project).data
+    return project_schema.dump(project)
 
 
 def project_owner_parser(project_id):

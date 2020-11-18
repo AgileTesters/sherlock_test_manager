@@ -13,7 +13,7 @@ def find_cycle(**kwargs):
 
 
 def last_cycle(project_id):
-    return Cycle.query.filter_by(project_id=project_id).order_by('-id').first()
+    return Cycle.query.filter_by(project_id=project_id).order_by('id').first()
 
 
 def cycle_cases_by_project(project_id):
