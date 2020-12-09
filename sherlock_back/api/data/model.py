@@ -41,18 +41,14 @@ class Project(db.Model):
     owner_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     description = db.Column(db.Text(500), nullable=False)
 
-    case = db.relationship('Case')
-    cycle = db.relationship('Cycle')
+    cases = db.relationship('Case', backref='project', lazy=True)
+    cycles = db.relationship('Cycle', backref='project', lazy=True)
 
     def __init__(self, name, owner_id, description):
         """Setting params to the object."""
         self.name = name
         self.owner_id = owner_id
         self.description = description
-
-    def __repr__(self):
-        """Representative Object Return."""
-        return '<Project %r>' % self.name
 
 
 class Case(db.Model):
@@ -61,19 +57,23 @@ class Case(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.Text(500), nullable=False)
-    project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
+    project_id = db.Column(db.Integer, db.ForeignKey('project.id'), nullable=False)
+
     parent_id = db.Column(db.Integer, nullable=True)
     entity = db.Column(db.Enum(EntityType))
     state_code = db.Column(db.Enum(StateType))
+    order_index = db.Column(db.Integer, nullable=False)
 
     cycle_cases = db.relationship('CycleCases')
+    case = db.relationship('Project')
 
-    def __init__(self, name, project_id, parent_id=None):
+    def __init__(self, name, project_id, order_index, entity, parent_id=None):
         self.name = name
         self.project_id = project_id
         self.parent_id = parent_id
-        self.entity = EntityType.case
+        self.entity = entity
         self.state_code = StateType.active
+        self.order_index = order_index
 
 
 class User(db.Model):
@@ -128,7 +128,7 @@ class Cycle(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     cycle = db.Column(db.Integer, nullable=False)
     name = db.Column(db.Text)
-    project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
+    project_id = db.Column(db.Integer, db.ForeignKey('project.id'), nullable=False)
     state_code = db.Column(db.Enum(StateType))
 
     cycle_cases = db.relationship('CycleCases')
@@ -220,6 +220,7 @@ class TestCaseSchema(Schema):
     project_id = fields.Int()
     parent_id = fields.Int()
     name = fields.Str()
+    order_index = fields.Int()
     state_code = EnumField(StateType)
 
 
@@ -234,8 +235,7 @@ class ProjectSchema(Schema):
     id = fields.Int(dump_only=True)
     name = fields.Str()
     owner_id = fields.Int()
-    type_of_project = fields.Str()
-    privacy_policy = fields.Str()
+    description = fields.Str()
 
 
 check_first_run(db)

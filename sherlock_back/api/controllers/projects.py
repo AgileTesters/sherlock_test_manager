@@ -13,7 +13,7 @@ def get_all_projects():
 
 
 def find_project(project_id):
-    project = Project.query.filter_by({'id': project_id}).first()
+    project = Project.query.filter_by(id=project_id).first()
     project_schema = ProjectSchema(many=False)
     return project_schema.dump(project)
 

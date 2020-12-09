@@ -2,13 +2,21 @@ from flask import Blueprint, request, jsonify, make_response, abort
 
 from sherlock_back.api import auth
 from sherlock_back.api.controllers.cases import (find_test_case, change_status_to_active,
-                                                 change_status_to_disable, change_status_to_removed, edit_test_case)
+                                                 change_status_to_disable, change_status_to_removed, edit_test_case,
+                                                 all_non_removed_cases_by_project)
 from sherlock_back.api.controllers.shared.cases import create_test_case
 from sherlock_back.api.controllers.tags import create_case_tag, delete_case_tag
 from sherlock_back.api.data.model import StateType
 from sherlock_back.api.helpers.string_operations import safe_fetch_content
 
 test_cases = Blueprint('test_cases', __name__)
+
+
+@test_cases.route('/find_by_project/<int:project_id>', methods=['GET'])
+@auth.login_required
+def fetch_test_cases(project_id):
+    cases = all_non_removed_cases_by_project(project_id)
+    return make_response(jsonify(cases))
 
 
 @test_cases.route('/case/<int:test_case_id>', methods=['GET'])
@@ -53,13 +61,21 @@ def new():
     """POST endpoint for new scenarios.
 
     Param:
-        {'test_case_text': required }
-        {'scenario_id': required }
+        {
+         'test_case_text': required,
+         'parent_id': required (0 for no parent),
+         'project_id': required,
+        }
     """
-    test_case_text = safe_fetch_content(request, 'test_case_text')
-    scenario_id = safe_fetch_content(request, 'scenario_id')
 
-    create_test_case(scenario_id, test_case_text)
+    test_case_text = safe_fetch_content(request, 'test_case_text')
+    parent_id = safe_fetch_content(request, 'parent_id')
+    project_id = safe_fetch_content(request, 'project_id')
+    create_test_case(
+        test_case_text = test_case_text,
+        parent_id=parent_id,
+        project_id=project_id,
+    )
     return make_response(jsonify(message='CASE_CREATED'))
 
 

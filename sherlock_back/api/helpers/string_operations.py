@@ -19,22 +19,28 @@ def is_empty(obj):
     return len(obj) == 0
 
 
-def safe_fetch_content(request, name):
+def safe_fetch_content(request, name, fallback=None):
     """
         Check if the request object contains the desired object and enforce that the object
         is not empty.
     """
 
     obj = request.json.get(name)
-    if not obj:
-        abort(make_response(jsonify(message='MISSING_{}'.format(name.upper())), 400))
+    if obj is None:
+        if not fallback:
+            abort(make_response(jsonify(message='MISSING_{}'.format(name.upper())), 400))
+        return fallback
 
     name = name.upper()
 
     if type(obj) is str:
         if obj.strip() == '':
-            abort(make_response(jsonify(message='EMPTY_STRING_{}'.format(name)), 400))
+            if not fallback:
+                abort(make_response(jsonify(message='EMPTY_STRING_{}'.format(name)), 400))
+            return fallback
     elif type(obj) is list:
         if len(obj) == 0:
-            abort(make_response(jsonify(message='EMPTY_LIST_{}'.format(name)), 400))
+            if not fallback:
+                abort(make_response(jsonify(message='EMPTY_LIST_{}'.format(name)), 400))
+            return fallback
     return obj
