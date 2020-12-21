@@ -2,14 +2,47 @@ from flask import Blueprint, request, jsonify, make_response, abort
 
 from sherlock_back.api import auth
 from sherlock_back.api.controllers.cases import (find_test_case, change_status_to_active,
-                                                 change_status_to_disable, change_status_to_removed, edit_test_case,
-                                                 all_non_removed_cases_by_project)
-from sherlock_back.api.controllers.shared.cases import create_test_case
+                                                 change_status_to_disable, change_status_to_removed,
+                                                 edit_test_case, all_non_removed_cases_by_project)
+from sherlock_back.api.controllers.shared.cases import (create_test_case,
+                                                        self_parent_and_mismatch_check,
+                                                        add_parent_id_to_cases, remove_parent_id_from_cases)
 from sherlock_back.api.controllers.tags import create_case_tag, delete_case_tag
 from sherlock_back.api.data.model import StateType
 from sherlock_back.api.helpers.string_operations import safe_fetch_content
 
 test_cases = Blueprint('test_cases', __name__)
+
+
+@test_cases.route('/attach', methods=['POST'])
+@auth.login_required
+def attach_cases():
+    project_id = safe_fetch_content(request, 'project_id')
+    cases_array = safe_fetch_content(request, 'cases_array')
+    parent_id = safe_fetch_content(request, 'parent_id')
+
+    msg = self_parent_and_mismatch_check(project_id, cases_array, parent_id)
+    if msg is None:
+        add_parent_id_to_cases(
+            cases_array=cases_array,
+            project_id=project_id,
+            target_case=parent_id
+        )
+        msg = "CASES_ATTACHED"
+    return make_response(jsonify(msg))
+
+
+@test_cases.route('/detach_cases', methods=['POST'])
+@auth.login_required
+def detach_cases():
+    project_id = safe_fetch_content(request, 'project_id')
+    cases_array = safe_fetch_content(request, 'cases_array')
+
+    remove_parent_id_from_cases(
+        cases_array=cases_array,
+        project_id=project_id,
+    )
+    return make_response(jsonify("CASES_DETACHED"))
 
 
 @test_cases.route('/find_by_project/<int:project_id>', methods=['GET'])
