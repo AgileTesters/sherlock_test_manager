@@ -1,0 +1,80 @@
+html{
+  font-family: 'Nunito', sans-serif !important;
+}
+
+.button{
+  box-shadow: 1px 1px 1px 1px #e0dddd;
+  padding: 10px;
+}
+
+.dashboard_default {
+  width:90%;
+  margin:auto;
+}
+
+.dashboard_item {
+  padding:20px;
+  border: 1px solid #bbbb;
+  margin-top: 30px;
+  background-color:white;
+  border-radius: 4px;
+  width: 390px;
+  height: 470px;
+  max-height: 470px;
+}
+
+.dashboard_item_large {
+  padding:20px;
+  border: 1px solid #bbbb;
+  margin-top: 30px;
+  background-color:white;
+  border-radius: 4px;
+  width: 80% ;
+  height: 500px;
+  max-height: 500px;
+  white-space: break-spaces;
+}
+
+.sherlock_tiles {
+  background-color:white;
+  border-radius: 3px;
+  white-space: break-spaces;
+  /* border: 1px solid #bbbb; */
+  box-shadow: none !important;
+}
+
+.case_tile{
+  background-color:white;
+  border-radius: 3px;
+  box-shadow: none !important;
+}
+
+.dashboard_title{
+    height: 72px;
+}
+
+.is-text-overflow {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    height: 150px;
+    max-height: 150px;
+    display: -webkit-box;
+    -webkit-line-clamp: 6;
+    -webkit-box-orient: vertical;
+    width: 350px;
+    white-space: break-spaces;
+}
+
+/* tbody:nth-child(odd) { background: #fff;  }
+tbody:nth-child(even) { background: #fafafa;   } */
+
+/* BULMA DOESNT KNOW HOW TO WORK WITH MUTIPLE TBODYS */
+
+.table td, .table th{
+  border-width: 1px 0px 1px !important;
+}
+
+thead td, thead th{
+  border-width: 0 0 2px !important
+}
