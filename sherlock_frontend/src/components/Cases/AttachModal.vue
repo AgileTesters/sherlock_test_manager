@@ -1,6 +1,32 @@
 <template>
-  <a class="" @click="showAttachCasesModal = !showAttachCasesModal; filterCases()">Attach cases</a> -
-  <a class="">Delete</a>
+  <div
+    class="dropdown is-right"
+    @click="showCasesMenu = !showCasesMenu; "
+    v-bind:class="{ 'is-active': showCasesMenu }"
+  >
+    <div class="dropdown-trigger">
+      <button>
+        <i class="far fa-ellipsis-v"></i>
+      </button>
+    </div>
+    <div class="dropdown-menu" id="dropdown-menu" role="menu">
+      <div class="dropdown-content">
+        <a
+          class="dropdown-item"
+          @click="
+            showAttachCasesModal = !showAttachCasesModal;
+            filterCases();">attach cases</a>
+        <a class="dropdown-item">
+          detach cases
+        </a>
+        <hr class="dropdown-divider" />
+        <a href="#" class="dropdown-item">
+          delete
+        </a>
+      </div>
+    </div>
+  </div>
+
   <div v-bind:class="{ 'is-active': showAttachCasesModal }" class="modal">
     <div class="modal-background"></div>
     <div class="modal-card">
@@ -10,19 +36,26 @@
       </header> -->
 
       <section class="modal-card-body">
-        <div class="title"> select the target case </div>
-        <table class="table is-fullwidth is-striped is-clickable" v-if="casesSelected.length > 0">
-            <tbody>
-              <tr v-for="item in casesToDisplay" :key="item.id" @click="attachCasesTo(item.id)">
-                <td>
-                  {{item.name}}
-                </td>
-              </tr>
+        <div class="title">select the target case</div>
+        <table
+          class="table is-fullwidth is-striped is-clickable"
+          v-if="casesSelected.length > 0"
+        >
+          <tbody>
+            <tr
+              v-for="item in casesToDisplay"
+              :key="item.id"
+              @click="attachCasesTo(item.id)"
+            >
+              <td>
+                {{ item.name }}
+              </td>
+            </tr>
           </tbody>
-
         </table>
         <div v-if="casesSelected.length == 0 || casesToDisplay.length == 0">
-          No data to display. Perhaps you select all cases or maybe no case at all?
+          No data to display. Perhaps you select all cases or maybe no case at
+          all?
         </div>
 
         <div class="field is-grouped">
@@ -34,7 +67,9 @@
         </div>
       </section>
       <footer class="modal-card-foot">
-        <button class="button" @click="showAttachCasesModal = false">cancel</button>
+        <button class="button" @click="showAttachCasesModal = false">
+          cancel
+        </button>
       </footer>
     </div>
   </div>
@@ -47,13 +82,14 @@ export default {
     return {
       error: null,
       showAttachCasesModal: false,
+      showCasesMenu: false,
       casesToDisplay: []
-    }
+    };
   },
   props: {
     casesSelected: Array,
     cases: Array,
-    projectId: String,
+    projectId: String
   },
   methods: {
     attachCasesTo(parent_id) {
@@ -79,10 +115,13 @@ export default {
         })
         .catch(error => {
           this.error = error;
-      });
-    }, filterCases() {
-      this.error = ""
-      this.casesToDisplay = this.cases.filter(d => !this.casesSelected.includes(d));
+        });
+    },
+    filterCases() {
+      this.error = "";
+      this.casesToDisplay = this.cases.filter(
+        d => !this.casesSelected.includes(d)
+      );
     }
   }
 };

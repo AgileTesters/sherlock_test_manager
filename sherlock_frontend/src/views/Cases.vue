@@ -14,19 +14,49 @@
             ></textarea>
           </div>
         </div>
+        <div class="tile is-child box sherlock_tiles">
+          <a class="button">save case</a>
+        </div>
+      </div>
+
+      <div class="tile is-child">
+        <div class="tile is-parent">
+          <div class="tile is-1 is-child">
+          </div>
+
+          <div class="tile is-child box is-4 sherlock_tiles has-text-centered">
+            <i class="fab fa-markdown" style="font-size:50px"></i>
+            <p class="has-text-left is-size-7"> Sherlock support <b>#Markdown</b> language! <br/> Click <a href="https://www.markdownguide.org/basic-syntax/"> here </a> to find out more about the syntax</p>
+          </div>
+
+          <div class="tile is-2 is-child">
+          </div>
+
+          <div class="tile is-child box is-4 sherlock_tiles has-text-centered">
+            <i class="fal fa-keyboard" style="font-size:50px"></i>
+            <p class="has-text-left is-size-7">Press SHIFT + ENTER to save your new test case</p>
+          </div>
+          <div class="tile is-1 is-child">
+          </div>
+        </div>
       </div>
     </div>
-    <div class="tile is-parent">
-      <div class="tile is-child box case_tile">
+
+    <div class="tile is-parent is-vertical">
+      <div class="tile is-child box case_tile" style="max-height: 70px;">
         <table class="table is-fullwidth" v-if="cases.length > 0">
           <thead>
             <tr>
-              <th></th>
-              <th>ref</th>
-              <th colspan="2">
+              <th>
+                <input type="checkbox"/>
+              </th>
+
+              <th>
                 <span>
                   cases
                 </span>
+              </th>
+              <th style="text-align: right;">
                 <span>
                   <attachModal
                     v-bind:casesSelected=casesSelected
@@ -37,33 +67,37 @@
               </th>
             </tr>
           </thead>
-          <tbody v-for="item in cases" :key="item.id">
+        </table>
+      </div>
+      <div class="tile is-child box case_tile">
+        <table class="table is-fullwidth" v-if="cases.length > 0">
+          <tbody v-for="item in cases" :key="item.exhibition_order">
             <tr>
-              <th>
+              <td>
                 <input
                   type="checkbox"
                   :value="item"
                   v-model="casesSelected"
                 />
-              </th>
-              <th class="col_id">
+              </td>
+              <td class="col_id">
                 <span>{{ item.id }}</span>
-              </th>
+              </td>
               <td><VueMarkdownIt :source="item.name" /></td>
-              <td><caseMenuElipisis /></td>
+              <td style="text-align: right;"><caseMenuElipisis /></td>
             </tr>
-            <tr v-for="sub_item in item.child_cases" :key="sub_item.id">
-              <th>
+            <tr v-for="sub_item in item.child_cases" :key="sub_item.exhibition_order">
+              <td>
                 <input
                   type="checkbox"
                   :value="sub_item"
                   v-model="casesSelected"
                 />
-              </th>
-              <th class="col_id">
+              </td>
+              <td class="col_id">
                 <span>{{ item.id }}</span
-                >-<span>{{ sub_item.id }}</span>
-              </th>
+                >-<span>{{ sub_item.exhibition_order }}</span>
+              </td>
               <td>
                 <div class="columns">
                   <div class="column is-1"></div>
@@ -72,11 +106,11 @@
                   </div>
                 </div>
               </td>
-              <td><caseMenuElipisis /></td>
+              <td style="text-align: right !important;"><caseMenuElipisis /></td>
             </tr>
           </tbody>
         </table>
-        <nav
+        <!-- <nav
           class="pagination is-small"
           role="navigation"
           aria-label="pagination"
@@ -103,9 +137,10 @@
             <li><span class="pagination-ellipsis">&hellip;</span></li>
             <li><a class="pagination-link" aria-label="Goto page 86">86</a></li>
           </ul>
-        </nav>
-        <div v-else>
-          No case created yet :)
+        </nav> -->
+        <div v-else class="has-text-centered">
+          <i class="fal fa-cat-space" style="font-size:50px"></i>
+          So much empty space...
         </div>
       </div>
     </div>

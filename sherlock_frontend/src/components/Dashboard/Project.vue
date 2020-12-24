@@ -35,9 +35,9 @@
         </div>
       </div>
       <div v-else style="text-align: center">
-        <i class="fal fa-pie" style="font-size: 50px"></i>
-        <p style="font-family: Nunito">
-          Hey, brand new project! Have some pie ;)
+        <i class="fal fa-cat-space" style="font-size:50px"></i>
+        <p class="is-family-monospace	is-size-7">
+          Hey, brand new project! Congrats! <br> But so much empty space....
         </p>
         <p></p>
       </div>

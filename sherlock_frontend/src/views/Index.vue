@@ -8,7 +8,7 @@
     </div>
     <div class="column" style="padding-top:15%">
       <div v-if="this.currentComponent == 'login'">
-        <p style="padding-bottom:20px">
+        <p style="padding-bottom:20px" class="is-family-monospace	is-size-5">
           let's go find some bugs together?
         </p>
         <div class="field">
@@ -72,8 +72,8 @@
         </div>
       </div>
       <div v-else>
-        <p style="padding-bottom:20px">
-          just a few inputs and you are go to go!
+        <p style="padding-bottom:20px" class="is-family-monospace	is-size-5">
+          just a few inputs and you're ready to go!
         </p>
         <div class="field">
           <div class="control has-icons-left has-icons-right">

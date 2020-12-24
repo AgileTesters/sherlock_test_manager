@@ -71,10 +71,10 @@ tbody:nth-child(even) { background: #fafafa;   } */
 
 /* BULMA DOESNT KNOW HOW TO WORK WITH MUTIPLE TBODYS */
 
-.table td, .table th{
+.table td {
   border-width: 1px 0px 1px !important;
 }
 
 thead td, thead th{
-  border-width: 0 0 2px !important
+  border-width: 0 !important
 }
