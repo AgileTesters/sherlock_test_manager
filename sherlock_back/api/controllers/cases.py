@@ -1,14 +1,36 @@
+from nested_lookup import nested_lookup
+
 from sherlock_back.api import db
-from sherlock_back.api.controllers.cycles import find_cycle_case, last_cycle
-from sherlock_back.api.data.model import (Case, TestCaseSchema, StateType, EntityType)
+from sherlock_back.api.controllers.cycles import find_cycle_case
+from sherlock_back.api.data.model import (Case, TestCaseSchema, StateType)
 
 
 def all_non_removed_cases_by_project(project_id):
     schema = TestCaseSchema(many=True)
     cases_query_result = Case.query.filter_by(
-        project_id=project_id).filter(
+        project_id=project_id).filter_by(parent_id=0).filter(
         Case.state_code != StateType.removed).all()
-    return schema.dump(cases_query_result)
+    cases_to_be_grouped_query_result = Case.query.filter_by(
+        project_id=project_id).filter(
+        Case.state_code != StateType.removed).filter(Case.project_id > 0).all()
+
+    main_cases = schema.dump(cases_query_result)
+    main_cases = sorted(main_cases, key=lambda k: k['order_index'])
+
+    for index, case in enumerate(main_cases):
+        case['child_cases'] = []
+        case['exhibition_order'] = index
+
+    to_be_grouped_cases = schema.dump(cases_to_be_grouped_query_result)
+    to_be_grouped_cases = sorted(to_be_grouped_cases, key=lambda k: k['order_index'])
+
+    for case in to_be_grouped_cases:
+        for main_case in main_cases:
+            if case['parent_id'] == main_case['id']:
+                # snapshot of the size of child_cases
+                case['exhibition_order'] = len(main_case.get('child_cases', 0)) + 1
+                main_case['child_cases'].append(case)
+    return main_cases
 
 
 # def active_cases_by_project(project_id):
