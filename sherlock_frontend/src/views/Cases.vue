@@ -34,7 +34,9 @@
 
           <div class="tile is-child box is-4 sherlock_tiles has-text-centered">
             <i class="fal fa-keyboard" style="font-size:50px"></i>
-            <p class="has-text-left is-size-7">Press SHIFT + ENTER to save your new test case</p>
+            <p class="has-text-left is-size-7">
+              Press SHIFT + ENTER to save your new test case
+            </p>
           </div>
           <div class="tile is-1 is-child">
           </div>
