@@ -3,6 +3,8 @@ import Index from "../views/Index.vue";
 import Dashboard from "../views/Dashboard.vue";
 import ProjectDashboard from "../views/ProjectDashboard.vue";
 import ManageCases from "../views/Cases.vue";
+import ExecuteCase from "../views/CaseExecution.vue";
+
 
 const routes = [
   {
@@ -24,6 +26,11 @@ const routes = [
     path: "/project/:projectId/cases",
     name: "manageCases",
     component: ManageCases
+  },
+  {
+    path: "/project/:projectId/execute",
+    name: "executeCases",
+    component: ExecuteCase
   }
 ];
 
