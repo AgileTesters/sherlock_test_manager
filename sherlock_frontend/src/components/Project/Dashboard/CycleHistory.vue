@@ -1,7 +1,4 @@
 <template>
-  <p style="font-size: 7px;">
-    current cycle summary:
-  </p>
   <div style="margin: auto">
     <div v-if="casesStats">
       <p style="font-size: 20px">Cycle number 35</p>

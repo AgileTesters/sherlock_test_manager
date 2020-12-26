@@ -3,7 +3,7 @@
 
   <div class="tile is-ancestor" style="margin-top:30px; width:95%; margin:auto">
     <div class="tile is-5 is-vertical is-parent">
-      <div class="tile is-child box sherlock_tiles">
+      <div class="tile is-child box sherlock_tiles has-text-right">
         <div class="field">
           <div class="control">
             <textarea
@@ -14,9 +14,7 @@
             ></textarea>
           </div>
         </div>
-        <div class="tile is-child box sherlock_tiles">
-          <a class="button">save case</a>
-        </div>
+          <a class="button" @click="addNewCase">save case</a>
       </div>
 
       <div class="tile is-child">
@@ -45,14 +43,14 @@
     </div>
 
     <div class="tile is-parent is-vertical">
-      <div class="tile is-child box case_tile" style="max-height: 70px;">
+      <div class="tile is-child box case_tile">
         <table class="table is-fullwidth" v-if="cases.length > 0">
           <thead>
             <tr>
               <th>
                 <input type="checkbox"/>
               </th>
-
+              <th></th>
               <th>
                 <span>
                   cases
@@ -69,10 +67,6 @@
               </th>
             </tr>
           </thead>
-        </table>
-      </div>
-      <div class="tile is-child box case_tile">
-        <table class="table is-fullwidth" v-if="cases.length > 0">
           <tbody v-for="item in cases" :key="item.exhibition_order">
             <tr>
               <td>
@@ -140,9 +134,11 @@
             <li><a class="pagination-link" aria-label="Goto page 86">86</a></li>
           </ul>
         </nav> -->
-        <div v-else class="has-text-centered">
-          <i class="fal fa-cat-space" style="font-size:50px"></i>
-          So much empty space...
+        <div v-else class="has-text-centered" style="margin">
+          <i class="fal fa-cat-space" style="font-size:50px"></i><br>
+          <p class="is-family-monospace	is-size-7">
+            So much empty space....
+          </p>
         </div>
       </div>
     </div>

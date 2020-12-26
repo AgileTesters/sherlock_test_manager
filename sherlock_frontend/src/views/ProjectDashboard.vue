@@ -8,8 +8,8 @@
   >
     <div class="tile is-4 is-vertical is-parent">
       <div class="tile is-child box sherlock_tiles">
-        <p style="font-size: 7px">{{ project.name }}</p>
-        <p class="title">PIX</p>
+        <p style="font-size: 7px">project name</p>
+          <p class="title">{{ project.name }}</p>
       </div>
       <div class="tile is-child box sherlock_tiles">
         <p style="font-size: 7px">description:</p>
@@ -68,9 +68,7 @@
         <p style="font-size: 7px;">
           cycle history:
         </p>
-          <p class="title">
-            d
-          </p>
+        <cycleHistory />
       </div>
     </div>
   </div>
@@ -82,11 +80,13 @@ import NavBar from "@/components/InternalNavBar";
 import axios from "axios";
 
 import StackedChart from "@/components/Project/Dashboard/StackedChart";
+import CycleHistory from "@/components/Project/Dashboard/CycleHistory";
 
 export default {
   components: {
     navBar: NavBar,
-    projectChart: StackedChart
+    projectChart: StackedChart,
+    cycleHistory: CycleHistory,
   },
   data() {
     return {
