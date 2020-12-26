@@ -84,29 +84,29 @@ def get_cases_for_cycle(project_id, cycle_id):
     return make_response(jsonify(scenario_with_cases))
 
 
-@cycles.route('/cycle/<int:cycle_id>/project/<int:project_id>/cases/case/<int:case_id>',methods=['GET'])
-@auth.login_required
-def change_cycle_case_state_code_(project_id, cycle_id, case_id):
-    """ Endpoint for changing the cycle cases state_code .
-    Param:
-        {
-            'action': required
-        }
-    """
-    action = safe_fetch_content(request, 'action')
-    project_last_cycle = last_cycle(project_id)
-
-    if cycle_id != project_last_cycle.id:
-        return make_response(jsonify(message='NOT_LAST_CYCLE'))
-
-    if action not in StateType.__members__:
-        return abort(make_response(jsonify(message='ACTION_UNKNOW'), 400))
-
-    changed = change_cycle_case_state_code(
-        action=action,
-        cycle_id=cycle_id,
-        case_id=case_id
-    )
-    if changed:
-        return make_response(jsonify(message='CYCLE_CASE_UPDATED'))
-    return abort(make_response(jsonify(message='CYCLE_CASE_NOT_UPDATED'), 400))
+# @cycles.route('/cycle/<int:cycle_id>/project/<int:project_id>/cases/case/<int:case_id>',methods=['GET'])
+# @auth.login_required
+# def change_cycle_case_state_code_(project_id, cycle_id, case_id):
+#     """ Endpoint for changing the cycle cases state_code .
+#     Param:
+#         {
+#             'action': required
+#         }
+#     """
+#     action = safe_fetch_content(request, 'action')
+#     project_last_cycle = last_cycle(project_id)
+#
+#     if cycle_id != project_last_cycle.id:
+#         return make_response(jsonify(message='NOT_LAST_CYCLE'))
+#
+#     if action not in StateType.__members__:
+#         return abort(make_response(jsonify(message='ACTION_UNKNOW'), 400))
+#
+#     changed = change_cycle_case_state_code(
+#         action=action,
+#         cycle_id=cycle_id,
+#         case_id=case_id
+#     )
+#     if changed:
+#         return make_response(jsonify(message='CYCLE_CASE_UPDATED'))
+#     return abort(make_response(jsonify(message='CYCLE_CASE_NOT_UPDATED'), 400))

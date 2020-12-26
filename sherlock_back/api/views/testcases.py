@@ -4,6 +4,7 @@ from sherlock_back.api import auth
 from sherlock_back.api.controllers.cases import (find_test_case, change_status_to_active,
                                                  change_status_to_disable, change_status_to_removed,
                                                  edit_test_case, all_non_removed_cases_by_project)
+from sherlock_back.api.controllers.cycles import last_cycle, change_cycle_case_state_code
 from sherlock_back.api.controllers.shared.cases import (create_test_case,
                                                         self_parent_and_mismatch_check,
                                                         add_parent_id_to_cases, remove_parent_id_from_cases)
@@ -130,6 +131,33 @@ def test_case_change_status_to_disable(case_id):
 @auth.login_required
 def test_case_change_status_to_remove(case_id):
     change_status_to_removed(case_id)
+    return make_response(jsonify(message='DONE'))
+
+
+@test_cases.route('/case/<int:case_id>/action', methods=['POST'])
+@auth.login_required
+def test_case_execute(case_id):
+    cycle_id = safe_fetch_content(request, 'cycle_id')
+    project_id = safe_fetch_content(request, 'project_id')
+    action = safe_fetch_content(request, 'action')
+
+    project_last_cycle = last_cycle(project_id)
+
+    if cycle_id != project_last_cycle.id:
+        return make_response(jsonify(message='NOT_LAST_CYCLE'))
+
+    if action not in StateType.__members__:
+        return abort(make_response(jsonify(message='ACTION_UNKNOW'), 400))
+
+    changed = change_cycle_case_state_code(
+        action=action,
+        cycle_id=cycle_id,
+        case_id=case_id
+    )
+    if changed:
+        return make_response(jsonify(message='CYCLE_CASE_UPDATED'))
+    return abort(make_response(jsonify(message='CYCLE_CASE_NOT_UPDATED'), 400))
+
     return make_response(jsonify(message='DONE'))
 
 
