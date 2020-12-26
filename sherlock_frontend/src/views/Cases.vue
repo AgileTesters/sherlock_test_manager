@@ -4,6 +4,21 @@
   <div class="tile is-ancestor" style="margin-top:30px; width:95%; margin:auto">
     <div class="tile is-5 is-vertical is-parent">
       <div class="tile is-child box sherlock_tiles has-text-right">
+
+        <div class="has-text-left" v-if="project">
+          <p style="font-size: 7px;">
+            project name:
+          </p>
+          <p style="font-size: 27px; font-weight: 600">
+            {{ project.name }}
+          </p>
+        </div>
+      </div>
+      <div class="tile is-child box sherlock_tiles has-text-right">
+        <p class="has-text-left" style="font-size: 7px;">
+          new case:
+        </p>
+        <br>
         <div class="field">
           <div class="control">
             <textarea
@@ -164,14 +179,14 @@ export default {
   },
   data() {
     return {
-      projectId: this.$route.params.projectId,
+        projectId: this.$route.params.projectId,
       cases: [],
       casesSelected: [],
       newCase: "",
       loading: false,
       tag_field: "",
       error: null,
-      showAttachCasesModal: false,
+      project: null,
       plugins: [
         {
           plugin: MarkdownHighligh
@@ -221,10 +236,24 @@ export default {
         .catch(error => {
           this.error = error;
         });
-    }
+    },
+    fetchProjectDetails() {
+      var requestOptions = {
+        method: "get",
+        url: "/projects/project/" + this.projectId
+      };
+      axios(requestOptions)
+        .then(response => {
+          this.project = response.data;
+        })
+        .catch(error => {
+          this.error = error;
+        });
+      }
   },
   async mounted() {
     await this.fetchCases();
+    await this.fetchProjectDetails();
   },
 };
 </script>
