@@ -57,7 +57,7 @@ def create_test_case(test_case_text, parent_id, project_id, entity=EntityType.ca
     if last_case:
         order_index = last_case.order_index + 1
     else:
-        order_index = 0
+        order_index = 1
 
     case = Case(
         name=test_case_text,
