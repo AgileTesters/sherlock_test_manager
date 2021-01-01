@@ -1,6 +1,5 @@
 import axios from "axios";
 import { createApp } from "vue";
-import VueMarkdownIt from "vue3-markdown-it";
 
 import App from "./App.vue";
 import router from "./router";
@@ -26,5 +25,4 @@ if (tokenData) {
 createApp(App)
   .use(store)
   .use(router)
-  .use(VueMarkdownIt)
   .mount("#app");
