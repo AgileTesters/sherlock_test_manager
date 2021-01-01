@@ -8,7 +8,7 @@
           <p style="font-size: 7px;">
             project name:
           </p>
-          <p class="title" >
+          <p class="title">
             {{ project.name }}
           </p>
         </div>
@@ -16,7 +16,7 @@
           <thead>
             <tr>
               <th>
-                <input type="checkbox"/>
+                <input type="checkbox" />
               </th>
               <th></th>
               <th>
@@ -27,9 +27,9 @@
               <th style="text-align: right;">
                 <span>
                   <attachModal
-                    v-bind:casesSelected=casesSelected
-                    v-bind:cases=cases
-                    v-bind:projectId=projectId
+                    v-bind:casesSelected="casesSelected"
+                    v-bind:cases="cases"
+                    v-bind:projectId="projectId"
                   />
                 </span>
               </th>
@@ -38,19 +38,27 @@
           <tbody v-for="item in cases" :key="item.exhibition_order">
             <tr>
               <td>
-                <input
-                  type="checkbox"
-                  :value="item"
-                  v-model="casesSelected"
-                />
+                <input type="checkbox" :value="item" v-model="casesSelected" />
               </td>
               <td class="col_id">
                 <span>{{ item.id }}</span>
               </td>
-              <td><VueMarkdownIt :source="item.name" /></td>
+              <td>
+                <VueMarkdownIt
+                  class="content"
+                  v-bind:typographer="true"
+                  :source="item.name"
+                  v-bind:breaks="true"
+                  v-bind:html="true"
+                  :plugins="plugins"
+                />
+              </td>
               <td style="text-align: right;"><actionCase /></td>
             </tr>
-            <tr v-for="sub_item in item.child_cases" :key="sub_item.exhibition_order">
+            <tr
+              v-for="sub_item in item.child_cases"
+              :key="sub_item.exhibition_order"
+            >
               <td>
                 <input
                   type="checkbox"
@@ -66,7 +74,14 @@
                 <div class="columns">
                   <div class="column is-1"></div>
                   <div class="column">
-                    <VueMarkdownIt :source="sub_item.name" />
+                    <VueMarkdownIt
+                      class="content"
+                      v-bind:typographer="true"
+                      :source="sub_item.name"
+                      v-bind:breaks="true"
+                      v-bind:html="true"
+                      :plugins="plugins"
+                    />
                   </div>
                 </div>
               </td>
@@ -103,7 +118,7 @@
           </ul>
         </nav> -->
         <div v-else class="has-text-centered" style="margin">
-          <i class="fal fa-cat-space" style="font-size:50px"></i><br>
+          <i class="fal fa-cat-space" style="font-size:50px"></i><br />
           <p class="is-family-monospace	is-size-7">
             So much empty space.... And I think you should not be here :)
           </p>
@@ -124,13 +139,13 @@ import MarkdownHighligh from "markdown-it-highlightjs";
 
 export default {
   components: {
-    VueMarkdownIt,
     navBar: NavBar,
     actionCase: ActionCase,
+    VueMarkdownIt
   },
   data() {
     return {
-        projectId: this.$route.params.projectId,
+      projectId: this.$route.params.projectId,
       cases: [],
       casesSelected: [],
       newCase: "",
@@ -200,12 +215,12 @@ export default {
         .catch(error => {
           this.error = error;
         });
-      }
+    }
   },
   async mounted() {
     await this.fetchCases();
     await this.fetchProjectDetails();
-  },
+  }
 };
 </script>
 <style>

@@ -3,8 +3,10 @@
 
   <div class="tile is-ancestor" style="margin-top:30px; width:95%; margin:auto">
     <div class="tile is-5 is-vertical is-parent">
-      <div class="tile is-child box sherlock_tiles has-text-right">
-
+      <div
+        class="tile is-child box sherlock_tiles has-text-right"
+        style="max-height: 100px;"
+      >
         <div class="has-text-left" v-if="project">
           <p style="font-size: 7px;">
             project name:
@@ -14,11 +16,14 @@
           </p>
         </div>
       </div>
-      <div class="tile is-child box sherlock_tiles has-text-right">
+      <div
+        class="tile is-child box sherlock_tiles has-text-right"
+        style="max-height: 250px;"
+      >
         <p class="has-text-left" style="font-size: 7px;">
           new case:
         </p>
-        <br>
+        <br />
         <div class="field">
           <div class="control">
             <textarea
@@ -29,21 +34,24 @@
             ></textarea>
           </div>
         </div>
-          <a class="button" @click="addNewCase">save case</a>
+        <a class="button" @click="addNewCase">save case</a>
       </div>
 
       <div class="tile is-child">
         <div class="tile is-parent">
-          <div class="tile is-1 is-child">
-          </div>
+          <div class="tile is-1 is-child"></div>
 
           <div class="tile is-child box is-4 sherlock_tiles has-text-centered">
             <i class="fab fa-markdown" style="font-size:50px"></i>
-            <p class="has-text-left is-size-7"> Sherlock support <b>#Markdown</b> language! <br/> Click <a href="https://www.markdownguide.org/basic-syntax/"> here </a> to find out more about the syntax</p>
+            <p class="has-text-left is-size-7">
+              Sherlock support <b>#Markdown</b> language! <br />
+              Click
+              <a href="https://www.markdownguide.org/basic-syntax/"> here </a>
+              to find out more about the syntax
+            </p>
           </div>
 
-          <div class="tile is-2 is-child">
-          </div>
+          <div class="tile is-2 is-child"></div>
 
           <div class="tile is-child box is-4 sherlock_tiles has-text-centered">
             <i class="fal fa-keyboard" style="font-size:50px"></i>
@@ -51,8 +59,7 @@
               Press SHIFT + ENTER to save your new test case
             </p>
           </div>
-          <div class="tile is-1 is-child">
-          </div>
+          <div class="tile is-1 is-child"></div>
         </div>
       </div>
     </div>
@@ -62,8 +69,8 @@
         <table class="table is-fullwidth" v-if="cases.length > 0">
           <thead>
             <tr>
-              <th>
-                <input type="checkbox"/>
+              <th class="col_id">
+                <input type="checkbox" />
               </th>
               <th></th>
               <th>
@@ -74,9 +81,9 @@
               <th style="text-align: right;">
                 <span>
                   <attachModal
-                    v-bind:casesSelected=casesSelected
-                    v-bind:cases=cases
-                    v-bind:projectId=projectId
+                    v-bind:casesSelected="casesSelected"
+                    v-bind:cases="cases"
+                    v-bind:projectId="projectId"
                   />
                 </span>
               </th>
@@ -84,21 +91,29 @@
           </thead>
           <tbody v-for="item in cases" :key="item.exhibition_order">
             <tr>
-              <td>
-                <input
-                  type="checkbox"
-                  :value="item"
-                  v-model="casesSelected"
-                />
+              <td class="col_id">
+                <input type="checkbox" :value="item" v-model="casesSelected" />
               </td>
               <td class="col_id">
-                <span>{{ item.id }}</span>
+                <span>{{ item.order_index }}</span>
               </td>
-              <td><VueMarkdownIt :source="item.name" /></td>
+              <td>
+                <VueMarkdownIt
+                  class="content"
+                  :source="item.name"
+                  v-bind:typographer="true"
+                  v-bind:breaks="true"
+                  v-bind:html="true"
+                  :plugins="plugins"
+                />
+              </td>
               <td style="text-align: right;"><caseMenuElipisis /></td>
             </tr>
-            <tr v-for="sub_item in item.child_cases" :key="sub_item.exhibition_order">
-              <td>
+            <tr
+              v-for="sub_item in item.child_cases"
+              :key="sub_item.exhibition_order"
+            >
+              <td class="col_id">
                 <input
                   type="checkbox"
                   :value="sub_item"
@@ -106,18 +121,27 @@
                 />
               </td>
               <td class="col_id">
-                <span>{{ item.id }}</span
+                <span>{{ item.order_index }}</span
                 >-<span>{{ sub_item.exhibition_order }}</span>
               </td>
               <td>
                 <div class="columns">
                   <div class="column is-1"></div>
                   <div class="column">
-                    <VueMarkdownIt :source="sub_item.name" />
+                    <VueMarkdownIt
+                      class="content"
+                      v-bind:typographer="true"
+                      :source="sub_item.name"
+                      v-bind:breaks="true"
+                      v-bind:html="true"
+                      :plugins="plugins"
+                    />
                   </div>
                 </div>
               </td>
-              <td style="text-align: right !important;"><caseMenuElipisis /></td>
+              <td style="text-align: right !important;">
+                <caseMenuElipisis />
+              </td>
             </tr>
           </tbody>
         </table>
@@ -150,7 +174,7 @@
           </ul>
         </nav> -->
         <div v-else class="has-text-centered" style="margin">
-          <i class="fal fa-cat-space" style="font-size:50px"></i><br>
+          <i class="fal fa-cat-space" style="font-size:50px"></i><br />
           <p class="is-family-monospace	is-size-7">
             So much empty space....
           </p>
@@ -168,6 +192,7 @@ import CaseMenuElipisis from "@/components/Cases/CaseElipsisMenu";
 import AttachModal from "@/components/Cases/AttachModal";
 
 import VueMarkdownIt from "vue3-markdown-it";
+
 import MarkdownHighligh from "markdown-it-highlightjs";
 
 export default {
@@ -179,7 +204,7 @@ export default {
   },
   data() {
     return {
-        projectId: this.$route.params.projectId,
+      projectId: this.$route.params.projectId,
       cases: [],
       casesSelected: [],
       newCase: "",
@@ -232,6 +257,7 @@ export default {
       axios(requestOptions)
         .then(response => {
           this.cases = response.data;
+          console.log(this.cases);
         })
         .catch(error => {
           this.error = error;
@@ -249,12 +275,12 @@ export default {
         .catch(error => {
           this.error = error;
         });
-      }
+    }
   },
   async mounted() {
     await this.fetchCases();
     await this.fetchProjectDetails();
-  },
+  }
 };
 </script>
 <style>
