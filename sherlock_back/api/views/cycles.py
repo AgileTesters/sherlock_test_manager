@@ -45,7 +45,7 @@ def close(cycle_id):
     return make_response(jsonify(message='CYCLE_CLOSED'))
 
 
-@cycles.route('/cycle', methods=['POST'])
+@cycles.route('/new', methods=['POST'])
 @auth.login_required
 def create():
     """POST endpoint for new cycles.

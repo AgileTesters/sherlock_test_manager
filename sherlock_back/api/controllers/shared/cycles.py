@@ -15,6 +15,7 @@ def check_cycle_pre_condition(project_id):
         return True
     return False
 
+
 def project_details(project_id):
     """Fetch and return a PROJECT with parsed data from cycles."""
     project = find_project(project_id)
@@ -38,22 +39,20 @@ def last_cycle_data_parser(project_id):
             user_closed_by = find_user(id=project_last_cycle.closed_by)
             closed_by = user_closed_by.name
 
-            closed_details = {
+            details['closed'] = {
                 'closed_at': datetime.strftime(project_last_cycle.closed_at, '%d-%m-%Y'),
                 'closed_reason': project_last_cycle.closed_reason,
-                'closed_by': closed_by,
+                'closed_by': closed_by
             }
-            details['closed'].update(closed_details)
 
         cycle_cases_h = cycle_cases_by_project(project_id)
-        cycle_details = {
+        details['cycle'] = {
             'id': project_last_cycle.id,
             'state_code': project_last_cycle.state_code.value,
             'cycle': project_last_cycle.cycle,
             'created_at': datetime.strftime(project_last_cycle.created_at, '%d-%m-%Y'),
             'stats': count_cycle_stats(cycle_cases_h)
         }
-        details['cycle'].update(cycle_details)
     return details
 
 
@@ -85,8 +84,8 @@ def create_cycle(project_id, cycle_name=None):
     for case in cases:
         create_test_case_cycle(
             cycle_id=new_cycle.id,
-            case_id=case.id,
-            parent_id=case.parent_id
+            case_id=case['id'],
+            parent_id=case['parent_id']
         )
 
     return new_cycle.id
