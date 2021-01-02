@@ -28,21 +28,25 @@ export default {
       var tokenData = JSON.parse(
         window.localStorage.getItem("authentication_data")
       );
-      var requestOptions = {
-        method: "get",
-        url: "/dashboard/",
-        headers: {
-          Authorization: "Bearer " + tokenData.token
-        }
-      };
-      await axios(requestOptions)
-        .then(response => {
-          this.projects = response.data.projects;
-        })
-        .catch(error => {
-          this.error = error;
-        });
-    }
+      if (tokenData) {
+        var requestOptions = {
+          method: "get",
+          url: "/dashboard/",
+          headers: {
+            Authorization: "Bearer " + tokenData.token
+          }
+        };
+        await axios(requestOptions)
+          .then(response => {
+            this.projects = response.data.projects;
+          })
+          .catch(error => {
+            this.error = error;
+          });
+      } else {
+        this.$router.push("/login");
+      }
+     }
   },
   async mounted() {
     await this.fecth_projects();
