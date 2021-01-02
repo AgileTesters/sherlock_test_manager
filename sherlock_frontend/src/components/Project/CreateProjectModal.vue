@@ -86,15 +86,13 @@ export default {
             this.error = response.data.message;
           } else {
             this.showCreateProjectModal = false;
+            this.$router.push({ name: 'projectDashboard', params: { projectId: response.data.project_id }});
           }
         })
         .catch(error => {
           this.error = error;
         });
     },
-  },
-  mounted() {
-
   }
 };
 </script>
