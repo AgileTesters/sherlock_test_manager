@@ -11,9 +11,9 @@
           <p style="font-size: 7px;">
             project name:
           </p>
-          <p style="font-size: 27px; font-weight: 600">
+          <router-link class="title" :to="{ name: 'projectDashboard', params: { projectId: projectId }}">
             {{ project.name }}
-          </p>
+          </router-link>
         </div>
       </div>
       <div
@@ -101,9 +101,9 @@
                 <VueMarkdownIt
                   class="content"
                   :source="item.name"
-                  v-bind:typographer="true"
-                  v-bind:breaks="true"
-                  v-bind:html="true"
+                  :typographer="true"
+                  :breaks="true"
+                  :html="true"
                   :plugins="plugins"
                 />
               </td>
@@ -130,10 +130,10 @@
                   <div class="column">
                     <VueMarkdownIt
                       class="content"
-                      v-bind:typographer="true"
+                      :typographer="true"
                       :source="sub_item.name"
-                      v-bind:breaks="true"
-                      v-bind:html="true"
+                      :breaks="true"
+                      :html="true"
                       :plugins="plugins"
                     />
                   </div>
@@ -192,7 +192,6 @@ import CaseMenuElipisis from "@/components/Cases/CaseElipsisMenu";
 import AttachModal from "@/components/Cases/AttachModal";
 
 import VueMarkdownIt from "vue3-markdown-it";
-
 import MarkdownHighligh from "markdown-it-highlightjs";
 
 export default {
