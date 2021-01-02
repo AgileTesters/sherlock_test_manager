@@ -1,13 +1,9 @@
-def check_first_run(db):    
-    db.create_all()
-    from sherlock_back.api.data.model import User
+from sqlalchemy_utils import create_database, database_exists
 
-    user = User.query.filter_by(id=1).first()
-    if user is None:
-        initial_user = User(name='Admin',
-                            email='admin@admin.xpto',
-                            password='admin',
-                            profile='admin')
-        db.session.add(initial_user)
-        db.session.commit()
 
+def initial_db_check():
+    db_url = 'root:12345@127.0.0.1/sherlock'
+    sqlalchemy_database_uri = 'mysql+pymysql://{}'.format(db_url)
+
+    if not database_exists(sqlalchemy_database_uri):
+        create_database(sqlalchemy_database_uri)

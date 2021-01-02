@@ -7,7 +7,6 @@ from flask import Flask, jsonify, make_response, g
 from flask_httpauth import HTTPBasicAuth, HTTPTokenAuth
 from flask_sqlalchemy import SQLAlchemy
 
-from sherlock_back.api.dbconfig import prod_db, dev_db
 from sherlock_back.api.blueprints import register_blue_prints
 from sherlock_back.api import config
 
@@ -15,20 +14,15 @@ app = Flask(__name__, instance_relative_config=True)
 current_folder = pathlib.Path(__file__).parent.absolute()
 
 app.config.from_object(config)
-# secret_key = app.config['SECRET_KEY']
-secret_key = 'temporarytoken'
-
-if 'SHERLOCK_ENV' in os.environ:
-    if os.environ['SHERLOCK_ENV'] == 'PROD':
-        db_url = prod_db()
-else:
-    from flask_cors import CORS
-    CORS(app, resources={r'/*': {"origins": '*', 'allow_headers': '*'}})
-    db_url = dev_db()
 
 
+# TODO: https://github.com/AgileTesters/sherlock_test_manager/issues/29
+from flask_cors import CORS
+CORS(app, resources={r'/*': {"origins": '*', 'allow_headers': '*'}})
+db_url = 'root:12345@127.0.0.1/sherlock'
 SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://{}'.format(db_url)
 app.config['SQLALCHEMY_DATABASE_URI'] = SQLALCHEMY_DATABASE_URI
+app.config['SQLALCHEMY_ECHO'] = True
 
 
 # Authentication Process

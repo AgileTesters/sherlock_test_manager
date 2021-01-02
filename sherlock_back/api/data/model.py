@@ -8,9 +8,11 @@ from marshmallow_enum import EnumField
 from itsdangerous import (TimedJSONWebSignatureSerializer
                           as Serializer, BadSignature, SignatureExpired)
 
-from sherlock_back.api import db, secret_key
-from sherlock_back.api.db_init import check_first_run
+from sherlock_back.api import db
+from sherlock_back.api.db_init import initial_db_check
 
+# TODO: https://github.com/AgileTesters/sherlock_test_manager/issues/29
+secret_key = 'temporarytoken'
 
 class EntityType(Enum):
     case = "case"
@@ -238,4 +240,5 @@ class ProjectSchema(Schema):
     description = fields.Str()
 
 
-check_first_run(db)
+initial_db_check()
+db.create_all()
