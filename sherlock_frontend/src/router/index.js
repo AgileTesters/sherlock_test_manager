@@ -5,7 +5,6 @@ import ProjectDashboard from "../views/ProjectDashboard.vue";
 import ManageCases from "../views/Cases.vue";
 import ExecuteCase from "../views/CaseExecution.vue";
 
-
 const routes = [
   {
     path: "/login",
