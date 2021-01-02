@@ -31,6 +31,7 @@ def create_project(name, owner_id, description):
     )
     db.session.add(new_project)
     db.session.commit()
+    return new_project
 
 
 def edit_project(project_id, project_payload):

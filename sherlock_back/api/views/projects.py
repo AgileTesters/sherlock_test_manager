@@ -32,13 +32,13 @@ def new():
     name = safe_fetch_content(request, 'name')
     description = safe_fetch_content(request, 'description')
 
-    create_project(
+    new_project = create_project(
         name=name,
         owner_id=int(g.user.id),
         description=description
     )
 
-    return make_response(jsonify(message='PROJECT_CREATED'))
+    return make_response(jsonify(message='PROJECT_CREATED', project_id=new_project.id))
 
 
 @project.route('/project/<int:project_id>/edit/', methods=['POST'])
