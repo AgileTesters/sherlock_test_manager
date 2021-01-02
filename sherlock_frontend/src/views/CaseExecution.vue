@@ -8,9 +8,9 @@
           <p style="font-size: 7px;">
             project name:
           </p>
-          <p class="title">
-            {{ project.name }}
-          </p>
+            <router-link class="title" :to="{ name: 'projectDashboard', params: { projectId: projectId }}">
+              {{ project.name }}
+            </router-link>
         </div>
         <table class="table is-fullwidth" v-if="cases.length > 0">
           <thead>
@@ -46,10 +46,10 @@
               <td>
                 <VueMarkdownIt
                   class="content"
-                  v-bind:typographer="true"
+                  :typographer="true"
                   :source="item.name"
-                  v-bind:breaks="true"
-                  v-bind:html="true"
+                  :breaks="true"
+                  :html="true"
                   :plugins="plugins"
                 />
               </td>
@@ -76,10 +76,10 @@
                   <div class="column">
                     <VueMarkdownIt
                       class="content"
-                      v-bind:typographer="true"
+                      :typographer="true"
                       :source="sub_item.name"
-                      v-bind:breaks="true"
-                      v-bind:html="true"
+                      :breaks="true"
+                      :html="true"
                       :plugins="plugins"
                     />
                   </div>
