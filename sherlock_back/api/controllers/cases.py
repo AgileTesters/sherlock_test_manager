@@ -1,5 +1,3 @@
-from nested_lookup import nested_lookup
-
 from sherlock_back.api import db
 from sherlock_back.api.controllers.cycles import find_cycle_case
 from sherlock_back.api.data.model import (Case, TestCaseSchema, StateType)
