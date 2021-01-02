@@ -92,7 +92,7 @@
             <a class="navbar-item">
               Profile
             </a>
-            <a class="navbar-item">
+            <a class="navbar-item" @click="logout">
               Logout
             </a>
             <hr class="navbar-divider" />
@@ -118,7 +118,13 @@ export default {
   data() {
     return {};
   },
-  mounted() {}
+  mounted() {},
+  methods: {
+    logout() {
+      localStorage.removeItem('authentication_data');
+      this.$router.push('/login');
+    }
+  }
 };
 </script>
 <style>
