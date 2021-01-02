@@ -9,7 +9,7 @@ Setting up your development env
 Tech menu:
 - docker: last version
   - last version mariadb container
-- pipenv: last version (python 3.9++)
+- pipenv: last version (python 3.9++) (doesnt work with macOs big sur)
 - node: at least v14
 
 
@@ -19,6 +19,7 @@ Setup database:
 ```
 docker pull mariadb
 docker run --name mariadbdev -p 3306:3306 -e MYSQL_ROOT_PASSWORD=12345 -d mariadb
+docker start mariadbdev
 ```
 Setup python:
 
