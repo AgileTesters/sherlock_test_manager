@@ -1,10 +1,9 @@
 <template>
   <nav class="navbar" role="navigation" aria-label="main navigation">
     <div class="navbar-brand">
-      <a class="navbar-item" href="https://bulma.io">
+      <router-link class="navbar-item" :to="{ path: '/dashboard' }">
         <img src="../assets/logo_navbar.png" />
-      </a>
-
+      </router-link>
       <a
         role="button"
         class="navbar-burger burger"
@@ -45,11 +44,11 @@
           </a>
           <div class="navbar-dropdown is-right">
             <a class="navbar-item">
-              Search or Else
+              TO BO IMPLEMENTED
             </a>
             <hr class="navbar-divider" />
             <a class="navbar-item">
-              create project
+              x
             </a>
           </div>
         </div>
