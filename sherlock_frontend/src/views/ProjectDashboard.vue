@@ -4,12 +4,12 @@
   <div
     v-if="project"
     class="tile is-ancestor dashboard_default"
-    style="margin-top:30px; width:85%; margin:auto"
+    style="margin-top:30px; width:95%; margin:auto"
   >
-    <div class="tile is-4 is-vertical is-parent">
+    <div class="tile is-4 is-vertical is-parent" style="max-height: 100px;">
       <div class="tile is-child box sherlock_tiles">
         <p style="font-size: 7px">project name</p>
-          <p class="title">{{ project.name }}</p>
+        <p class="title">{{ project.name }}</p>
       </div>
       <div class="tile is-child box sherlock_tiles">
         <p style="font-size: 7px">description:</p>
@@ -25,42 +25,12 @@
             class="tile is-parent box is-8 sherlock_tiles"
             style="margin-right: 20px; margin-bottom: 0px;"
           >
-            <projectChart :stats="project.last_cycle.cycle"/>
+            <projectChart :stats="project.last_cycle.cycle" />
           </div>
-          <div class="panel is-info tile is-child sherlock_tiles" style="padding: 0;">
-            <p class="panel-heading sherlock_tiles">
-              actions menu
-            </p>
-            <router-link class="panel-block" :to="{ name: 'manageCases', params: { projectId: project.id}}">
-              <span class="panel-icon">
-                <i class="fas fa-book" aria-hidden="true"></i>
-              </span>
-              manage Cases
-            </router-link>
-            <a class="panel-block">
-              <span class="panel-icon">
-                <i class="fas fa-code-branch" aria-hidden="true"></i>
-              </span>
-              execute test
-            </a>
-
-                <div v-if="project.last_cycle.cycle || project.last_cycle.closed">
-                  <a class="panel-block">
-                    <span class="panel-icon">
-                      <i class="fas fa-code-branch" aria-hidden="true"></i>
-                    </span>
-                    stop cycle
-                  </a>
-                </div>
-                <div v-else>
-                  <a class="panel-block">
-                    <span class="panel-icon">
-                      <i class="fas fa-code-branch" aria-hidden="true"></i>
-                    </span>
-                    new cycle
-
-                  </a>
-                </div>
+          <div
+            class="panel is-info tile is-child sherlock_tiles"
+            style="padding: 0;">
+            <projectMenu :project="project" />
           </div>
         </div>
       </div>
@@ -81,12 +51,14 @@ import axios from "axios";
 
 import StackedChart from "@/components/Project/Dashboard/StackedChart";
 import CycleHistory from "@/components/Project/Dashboard/CycleHistory";
+import ProjectMenu from "@/components/Project/Dashboard/ProjectMenu";
 
 export default {
   components: {
     navBar: NavBar,
     projectChart: StackedChart,
     cycleHistory: CycleHistory,
+    projectMenu: ProjectMenu,
   },
   data() {
     return {
@@ -110,7 +82,6 @@ export default {
   },
   async mounted() {
     await this.fecth_project();
-    console.log(this.project);
   }
 };
 </script>
