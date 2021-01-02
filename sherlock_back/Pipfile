@@ -19,6 +19,7 @@ pyyaml = "*"
 marshmallow = "*"
 marshmallow-enum = "*"
 unidecode = "*"
+sqlalchemy-utils = "*"
 
 [requires]
 python_version = "3.9"
