@@ -1,5 +1,4 @@
 """Flask and plugin init"""
-import os
 import pathlib
 
 
@@ -22,7 +21,7 @@ CORS(app, resources={r'/*': {"origins": '*', 'allow_headers': '*'}})
 db_url = 'root:12345@127.0.0.1/sherlock'
 SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://{}'.format(db_url)
 app.config['SQLALCHEMY_DATABASE_URI'] = SQLALCHEMY_DATABASE_URI
-app.config['SQLALCHEMY_ECHO'] = True
+app.config['SQLALCHEMY_ECHO'] = False
 
 
 # Authentication Process
