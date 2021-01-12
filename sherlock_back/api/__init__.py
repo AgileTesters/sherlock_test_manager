@@ -6,14 +6,18 @@ import os
 from flask import Flask, jsonify, make_response, g
 from flask_httpauth import HTTPBasicAuth, HTTPTokenAuth
 from flask_sqlalchemy import SQLAlchemy
+from os import environ, path
+from dotenv import load_dotenv
 
 from sherlock_back.api.blueprints import register_blue_prints
 from sherlock_back.api import config
 
 app = Flask(__name__, instance_relative_config=True)
 current_folder = pathlib.Path(__file__).parent.absolute()
+basedir = os.path.abspath(os.path.dirname(__file__))
+load_dotenv(path.join(basedir, '.env'))
 
-app.config.from_object(os.environ['APP_SETTINGS'])
+app.config.from_object(os.environ.get('APP_SETTINGS'))
 
 
 # TODO: https://github.com/AgileTesters/sherlock_test_manager/issues/29
