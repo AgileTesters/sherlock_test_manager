@@ -1,5 +1,6 @@
 """Flask and plugin init"""
 import pathlib
+import os
 
 
 from flask import Flask, jsonify, make_response, g
@@ -12,13 +13,13 @@ from sherlock_back.api import config
 app = Flask(__name__, instance_relative_config=True)
 current_folder = pathlib.Path(__file__).parent.absolute()
 
-app.config.from_object(config)
+app.config.from_object(os.environ['APP_SETTINGS'])
 
 
 # TODO: https://github.com/AgileTesters/sherlock_test_manager/issues/29
 from flask_cors import CORS
 CORS(app, resources={r'/*': {"origins": '*', 'allow_headers': '*'}})
-db_url = 'root:12345@127.0.0.1/sherlock'
+db_url = os.environ['DB_URL']
 SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://{}'.format(db_url)
 app.config['SQLALCHEMY_DATABASE_URI'] = SQLALCHEMY_DATABASE_URI
 app.config['SQLALCHEMY_ECHO'] = False
