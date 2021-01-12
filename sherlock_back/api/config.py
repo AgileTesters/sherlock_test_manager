@@ -15,10 +15,11 @@ class Config(object):
 
 class Production(Config):
     DEBUG = False
+    FLASK_ENV = 'production'
 
 class DevelopmentConfig(Config):
-    DEVELOPMENT = True
     DEBUG = True
+    FLASK_ENV = 'development'
 
 class TestingConfig(Config):
     TESTING = True
