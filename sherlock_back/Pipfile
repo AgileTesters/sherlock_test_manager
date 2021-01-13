@@ -21,6 +21,7 @@ marshmallow = "*"
 marshmallow-enum = "*"
 unidecode = "*"
 sqlalchemy-utils = "*"
+config = "*"
 
 [requires]
 python_version = "3.9"

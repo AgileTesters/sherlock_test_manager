@@ -2,7 +2,9 @@
 """Configuration params for sherlock."""
 import os
 import secrets
+
 basedir = os.path.abspath(os.path.dirname(__file__))
+
 
 class Config(object):
     DEBUG = False
@@ -13,13 +15,16 @@ class Config(object):
     SQLALCHEMY_MIGRATE_REPO = os.path.join(basedir, 'db_repository')
     SQLALCHEMY_TRACK_MODIFICATIONS = True
 
+
 class Production(Config):
     DEBUG = False
     FLASK_ENV = 'production'
 
+
 class DevelopmentConfig(Config):
     DEBUG = True
     FLASK_ENV = 'development'
+
 
 class TestingConfig(Config):
     TESTING = True
