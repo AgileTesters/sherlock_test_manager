@@ -6,9 +6,12 @@ import os
 
 from flask import Flask, jsonify, make_response, g
 from flask_httpauth import HTTPBasicAuth, HTTPTokenAuth
+from flask_restful import Api
 from flask_sqlalchemy import SQLAlchemy
 from os import environ, path
 from dotenv import load_dotenv
+from flask_restful_swagger import swagger
+from werkzeug.utils import redirect
 
 from sherlock_back.api.blueprints import register_blue_prints
 from sherlock_back.api import config
@@ -40,6 +43,16 @@ db = SQLAlchemy(app)
 from sherlock_back.api.data import model
 
 register_blue_prints(app)
+
+api = swagger.docs(
+    Api(app),
+    apiVersion="0.1",
+    basePath="http://localhost:5000",
+    resourcePath="/",
+    produces=["application/json", "text/html"],
+    api_spec_url="/api/spec",
+    description="Sherlock Swagger API",
+)
 
 
 @auth.verify_token
@@ -75,3 +88,7 @@ def login_and_generate_token():
             'duration': 604800,
         })
     )
+
+@app.route("/docs")
+def docs():
+    return redirect("/static/docs.html")
