@@ -2,8 +2,6 @@
 import pathlib
 import os
 
-
-
 from flask import Flask, jsonify, make_response, g
 from flask_httpauth import HTTPBasicAuth, HTTPTokenAuth
 from flask_restful import Api
@@ -23,20 +21,18 @@ load_dotenv(path.join(basedir, '.env'))
 
 app.config.from_object(os.environ.get('APP_SETTINGS'))
 
-
 # TODO: https://github.com/AgileTesters/sherlock_test_manager/issues/29
 from flask_cors import CORS
+
 CORS(app, resources={r'/*': {"origins": '*', 'allow_headers': '*'}})
 db_url = os.environ['DB_URL']
 SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://{}'.format(db_url)
 app.config['SQLALCHEMY_DATABASE_URI'] = SQLALCHEMY_DATABASE_URI
 app.config['SQLALCHEMY_ECHO'] = False
 
-
 # Authentication Process
 auth = HTTPTokenAuth(scheme='Bearer')
 login = HTTPBasicAuth()
-
 
 # Will load the Models and create the tables
 db = SQLAlchemy(app)
@@ -88,6 +84,7 @@ def login_and_generate_token():
             'duration': 604800,
         })
     )
+
 
 @app.route("/docs")
 def docs():
