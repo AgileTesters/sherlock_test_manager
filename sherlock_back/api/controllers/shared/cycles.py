@@ -17,13 +17,14 @@ def check_cycle_pre_condition(project_id):
 
 
 def project_details(project_id):
-    """Fetch and return a PROJECT with parsed data from cycles."""
+    """Fetch project + last cycle and return a object with parsed data from last cycle."""
     project = find_project(project_id)
     project_last_cycle = last_cycle_data_parser(project_id)
 
     user = find_user(id=project['owner_id'])
     project.update({'owner_name': user['name']})
     project.update({'last_cycle': project_last_cycle})
+    project.update({'qty_cases': len(all_non_removed_cases_by_project(project_id))})
     return project
 
 
@@ -62,16 +63,9 @@ def create_cycle(project_id, cycle_name=None):
         {'cycle_name': required but can be empty }
     """
 
-    project_last_cycle = last_cycle(project_id)
-    if project_last_cycle and project_last_cycle.state_code == StateType.active:
-        return False
-
     # fetch all project cycles
     cycle_number = count_cycles_for_project(project_id)
     cases = all_non_removed_cases_by_project(project_id)
-
-    if len(cases) == 0:
-        return False
 
     new_cycle = Cycle(
         cycle=cycle_number,

@@ -2,6 +2,7 @@
 from flask import Blueprint, request, g, jsonify, make_response, abort
 
 from sherlock_back.api import auth
+from sherlock_back.api.controllers.cases import all_non_removed_cases_by_project
 from sherlock_back.api.controllers.cycles import (cycle_timeline_resume_by_project,
                                                   get_cycle_case_stats, close_cycle, last_cycle,
                                                   change_cycle_case_state_code)
@@ -65,6 +66,10 @@ def create():
 
     if project_last_cycle and project_last_cycle.state_code == StateType.active:
         return make_response(jsonify(message='CURRENT_CYCLE_ACTIVE'))
+
+    if len(all_non_removed_cases_by_project(project_id)) == 0:
+        return make_response(jsonify(message='PROJECT_HAVE_NO_CASES'), 400)
+        # TODO: Should this 400 be another error?
 
     cycle_id = create_cycle(
         project_id=project_id,
