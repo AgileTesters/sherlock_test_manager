@@ -28,10 +28,16 @@
       </div>
     </div>
     <div v-else class="has-text-centered">
-      <i class="fal fa-cat-space" style="font-size:50px"></i>
       <br>
-      <p class="is-family-monospace	is-size-7">
-        So much empty space....
+      <i class="fal fa-info-square" style="font-size:50px"></i>
+      <br><br>
+      <p class="is-family-monospace	is-size-7 has-text-left">
+        This seems like a fresh new project!
+      </p>
+      <p class="is-family-monospace	is-size-7 has-text-left">
+        In order to create a new execution cycle, you need to: <br/>
+         1 - create cases by using the menu 'manage cycles' <br />
+         2 - click on 'new execution cycle'
       </p>
     </div>
   </div>

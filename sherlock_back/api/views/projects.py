@@ -28,8 +28,6 @@ def new():
             description: required
          }
     """
-    import pdb
-    pdb.set_trace()
 
     name = safe_fetch_content(request, 'name')
     description = safe_fetch_content(request, 'description')

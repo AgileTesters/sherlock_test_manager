@@ -27,12 +27,14 @@
     </a>
   </div>
   <div v-else>
-    <a class="panel-block" @click="showCreateCycleModel = true">
-      <span class="panel-icon">
-        <i class="fas fa-code-branch" aria-hidden="true"></i>
-      </span>
-      new cycle
-    </a>
+    <div v-if="project.qty_cases > 0">
+      <a class="panel-block" @click="showCreateCycleModel = true">
+        <span class="panel-icon">
+          <i class="fas fa-code-branch" aria-hidden="true"></i>
+        </span>
+        new execution cycle
+      </a>
+    </div>
   </div>
 
   <div v-bind:class="{ 'is-active': showCreateCycleModel }" class="modal">
@@ -40,7 +42,11 @@
     <div class="modal-card">
       <header class="modal-card-head">
         <p class="modal-card-title">Create Cycle</p>
-        <button class="delete" aria-label="close" @click="showCreateCycleModel = false"></button>
+        <button
+          class="delete"
+          aria-label="close"
+          @click="showCreateCycleModel = false"
+        ></button>
       </header>
       <section class="modal-card-body">
         <div class="field">
@@ -64,7 +70,9 @@
       </section>
       <footer class="modal-card-foot">
         <button class="button is-primary" @click="createCycle()">create</button>
-        <button class="button" @click="showCreateCycleModel = false">cancel</button>
+        <button class="button" @click="showCreateCycleModel = false">
+          cancel
+        </button>
       </footer>
     </div>
   </div>
@@ -88,12 +96,21 @@ export default {
     project: Object
   },
   methods: {
-     executeCase: function() {
-       this.router.push({ path: '/dashboard' });
-     },
-     createCycle: function() {
-      if(this.project.last_cycle.cycle || this.project.last_cycle.closed) {
-        this.error = "Cannot create a new cycle when the previous one still active";
+    executeCase: function() {
+      this.$router.push({
+        name: "executeCases",
+        params: { projectId: this.$route.params.projectId }
+      });
+    },
+    createCycle: function() {
+      if (this.project.last_cycle.cycle || this.project.last_cycle.closed) {
+        this.error =
+          "Cannot create a new cycle when the previous one still active";
+        return false;
+      }
+
+      if (this.project.qty_cases == 0) {
+        this.error = "Cannot create a new cycle when there is no case created";
         return false;
       }
       var requestOptions = {
@@ -104,21 +121,24 @@ export default {
           project_id: this.newCycle.project_id
         }
       };
+
       axios(requestOptions)
         .then(response => {
           // TODO: add visual feedback that is working
           if (response.data.message != "CYCLE_CREATED") {
             this.error = response.data.message;
           } else {
-            this.showCreateCycleModel = false
-            this.router.push({ name: 'manageCases', params: { projectId: this.$route.params.projectId } });
+            this.showCreateCycleModel = false;
+            this.$router.push({
+              name: "executeCases",
+              params: { projectId: this.$route.params.projectId }
+            });
           }
         })
         .catch(error => {
-          this.error = error;
+          this.error = error.response.data.message;
         });
     }
-
   }
 };
 </script>
